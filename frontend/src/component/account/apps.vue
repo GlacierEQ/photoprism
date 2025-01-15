@@ -54,19 +54,7 @@
                 <translate>Please copy the following randomly generated app password and keep it in a safe place, as you will not be able to see it again:</translate>
               </v-col>
               <v-col cols="12">
-                <v-text-field
-                  v-model="appPassword"
-                  type="text"
-                  hide-details
-                  readonly
-                  autocorrect="off"
-                  autocapitalize="none"
-                  autocomplete="off"
-                  class="input-app-password text-selectable"
-                  append-inner-icon="mdi-content-copy"
-                  @click:append-inner="onCopyAppPassword"
-                >
-                </v-text-field>
+                <v-text-field v-model="appPassword" type="text" hide-details readonly autocorrect="off" autocapitalize="none" autocomplete="off" class="input-app-password text-selectable" append-inner-icon="mdi-content-copy" @click:append-inner="onCopyAppPassword"> </v-text-field>
               </v-col>
             </v-row>
           </v-card-text>
@@ -114,17 +102,7 @@
           <v-card-text>
             <v-row align="start" no-gutters>
               <v-col cols="12">
-                <v-data-table
-                    v-model="selected"
-                    :headers="listColumns"
-                    :items="results"
-                    hover
-                    hide-default-footer
-                    item-key="ID"
-                    :no-data-text="$gettext('Nothing was found.')"
-                    density="compact"
-                    class="elevation-0 user-results list-view"
-                >
+                <v-data-table v-model="selected" :headers="listColumns" :items="results" :items-per-page-options="[]" hide-default-footer item-key="ID" :no-data-text="$gettext('Nothing was found.')" density="compact" class="elevation-0 user-results list-view">
                   <template #item="props">
                     <tr :data-name="props.item.ClientName">
                       <td class="text-selectable text-break text-start">

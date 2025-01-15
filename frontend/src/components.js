@@ -243,6 +243,8 @@ export const defaults = {
   },
   VDataTable: {
     color: "background",
+    itemsPerPage: -1,
+    hover: true,
   },
   VExpansionPanel: {
     tile: true,
