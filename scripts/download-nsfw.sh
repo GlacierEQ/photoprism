@@ -12,9 +12,9 @@ MODEL_BACKUP="storage/backup/nsfw-$TODAY"
 
 echo "Installing $MODEL_NAME model for TensorFlow..."
 
-# Create directories
-mkdir -p /tmp/photoprism
-mkdir -p storage/backup
+# Create directories and check for success
+mkdir -p /tmp/photoprism || { echo "Failed to create /tmp/photoprism"; exit 1; }
+mkdir -p storage/backup || { echo "Failed to create storage/backup"; exit 1; }
 
 # Check for update
 if [[ -f ${MODEL_ZIP} ]] && [[ $(sha1sum ${MODEL_ZIP}) == "${MODEL_HASH}" ]]; then

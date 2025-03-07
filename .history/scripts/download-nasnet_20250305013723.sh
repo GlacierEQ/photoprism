@@ -2,22 +2,22 @@
 
 TODAY=$(date -u +%Y%m%d)
 
-MODEL_NAME="Facenet"
-MODEL_URL="https://dl.photoprism.app/tensorflow/facenet.zip?$TODAY"
-MODEL_PATH="assets/facenet"
-MODEL_ZIP="/tmp/photoprism/facenet.zip"
-MODEL_HASH="0492eb1d67789108b7eefb274e26633504b059be  $MODEL_ZIP"
+MODEL_NAME="NASNet Mobile"
+MODEL_URL="https://dl.photoprism.app/tensorflow/nasnet.zip?$TODAY"
+MODEL_PATH="assets/nasnet"
+MODEL_ZIP="/tmp/photoprism/nasnet.zip"
+MODEL_HASH="f18b801354e95cade497b4f12e8d2537d04c04f6  $MODEL_ZIP"
 MODEL_VERSION="$MODEL_PATH/version.txt"
-MODEL_BACKUP="storage/backup/facenet-$TODAY"
+MODEL_BACKUP="storage/backup/nasnet-$TODAY"
 
 echo "Installing $MODEL_NAME model for TensorFlow..."
 
-# Create directories and check for success
-mkdir -p /tmp/photoprism || { echo "Failed to create /tmp/photoprism"; exit 1; }
-mkdir -p storage/backup || { echo "Failed to create storage/backup"; exit 1; }
+# Create directories
+mkdir -p /tmp/photoprism
+mkdir -p storage/backup
 
 # Check for update
-if [[ -f ${MODEL_ZIP} ]] && [[ $(sha1sum ${MODEL_ZIP}) == ${MODEL_HASH} ]]; then
+if [[ -f ${MODEL_ZIP} ]] && [[ $(sha1sum ${MODEL_ZIP}) == "${MODEL_HASH}" ]]; then
   if [[ -f ${MODEL_VERSION} ]]; then
     echo "Already up to date."
     exit
