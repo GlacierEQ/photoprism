@@ -45,10 +45,12 @@ Being completely [**self-funded and independent**](https://link.photoprism.app/m
 
 ## Getting Started ##
 
-### Installation Instructions ###
-To get started with PhotoPrism, follow these installation instructions:
+For detailed installation instructions and advanced configuration options, please see our comprehensive [Installation Guide](INSTALL.md).
 
-1. **Using Docker**:
+### Quick Start ###
+To get started with PhotoPrism, you can:
+
+1. **Using Docker** (Recommended):
    - Ensure you have [Docker](https://docs.docker.com/get-docker/) installed on your machine.
    - Run the following command to start the application:
      ```bash
