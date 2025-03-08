@@ -33,6 +33,14 @@ To get a first impression, you are welcome to play with our [public demo](https:
 * Use [PhotoSync](https://link.photoprism.app/photosync) to securely backup iOS and Android phones in the background
 * WebDAV clients such as Microsoft's Windows Explorer and Apple's Finder [can connect directly](https://docs.photoprism.app/user-guide/sync/webdav/) to PhotoPrism, allowing you to open, edit, and delete files from your computer as if they were local
 
+### New Features and Improvements ###
+
+* Enhanced support for various image and video formats, including newer RAW formats
+* Improved RAW file handling with automatic conversion to JPEG
+* Adaptive worker scaling based on system resources for optimized performance
+* JSON sidecar file creation for improved metadata management
+* Comprehensive unit tests to ensure reliability and stability
+
 Being completely [**self-funded and independent**](https://link.photoprism.app/membership), we can promise you that we will [never sell your data](https://www.photoprism.app/privacy) and that we will [always be transparent](https://www.photoprism.app/terms) about our software and services. Your data will never be shared with Google, Amazon, Microsoft or Apple unless you intentionally upload files to one of their services. 🔒
 
 ## Getting Started ##
