@@ -27,15 +27,20 @@ GO_VER=$($GO_BIN version)
 echo "Building PhotoPrism ${BUILD_ID} ($1)..."
 
 if [[ $1 == "develop" ]]; then
-  BUILD_CMD=("$GO_BIN" build -tags="debug,develop" -ldflags "-X main.version=${BUILD_ID}-DEVELOP" -o "${BUILD_BIN}" cmd/photoprism/photoprism.go)
+  # Added brains tag to develop build
+  BUILD_CMD=("$GO_BIN" build -tags="debug,develop,brains" -ldflags "-X main.version=${BUILD_ID}-DEVELOP" -o "${BUILD_BIN}" cmd/photoprism/photoprism.go)
 elif [[ $1 == "race" ]]; then
-  BUILD_CMD=("$GO_BIN" build -tags="debug" -race -ldflags "-X main.version=${BUILD_ID}-RACE" -o "${BUILD_BIN}" cmd/photoprism/photoprism.go)
+  # Added brains tag to race build
+  BUILD_CMD=("$GO_BIN" build -tags="debug,brains" -race -ldflags "-X main.version=${BUILD_ID}-RACE" -o "${BUILD_BIN}" cmd/photoprism/photoprism.go)
 elif [[ $1 == "static" ]]; then
-  BUILD_CMD=("$GO_BIN" build -a -v -ldflags "-linkmode external -extldflags \"-static -L /usr/lib -ltensorflow\" -s -w -X main.version=${BUILD_ID}-STATIC" -o "${BUILD_BIN}" cmd/photoprism/photoprism.go)
+  # Added brains tag to static build
+  BUILD_CMD=("$GO_BIN" build -a -v -tags="static,brains" -ldflags "-linkmode external -extldflags \"-static -L /usr/lib -ltensorflow\" -s -w -X main.version=${BUILD_ID}-STATIC" -o "${BUILD_BIN}" cmd/photoprism/photoprism.go)
 elif [[ $1 == "debug" ]]; then
-  BUILD_CMD=("$GO_BIN" build -tags="debug" -ldflags "-extldflags \"-Wl,-rpath -Wl,\$ORIGIN/../lib\" -s -w -X main.version=${BUILD_ID}" -o "${BUILD_BIN}-DEBUG" cmd/photoprism/photoprism.go)
+  # Added brains tag to debug build
+  BUILD_CMD=("$GO_BIN" build -tags="debug,brains" -ldflags "-extldflags \"-Wl,-rpath -Wl,\$ORIGIN/../lib\" -s -w -X main.version=${BUILD_ID}" -o "${BUILD_BIN}-DEBUG" cmd/photoprism/photoprism.go)
 else
-  BUILD_CMD=("$GO_BIN" build -ldflags "-extldflags \"-Wl,-rpath -Wl,\$ORIGIN/../lib\" -s -w -X main.version=${BUILD_ID}" -o "${BUILD_BIN}" cmd/photoprism/photoprism.go)
+  # Added brains tag to production build
+  BUILD_CMD=("$GO_BIN" build -tags="brains" -ldflags "-extldflags \"-Wl,-rpath -Wl,\$ORIGIN/../lib\" -s -w -X main.version=${BUILD_ID}" -o "${BUILD_BIN}" cmd/photoprism/photoprism.go)
 fi
 
 # Build app binary.

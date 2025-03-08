@@ -761,3 +761,49 @@ func (c *Config) Hub() *hub.Config {
 
 	return c.hub
 }
+
+// BrainsPath returns the path to BRAINS model files.
+func (c *Config) BrainsPath() string {
+	return filepath.Join(c.AssetsPath(), "brains")
+}
+
+// BrainsEnabled returns true if BRAINS is enabled.
+func (c *Config) BrainsEnabled() bool {
+	if c.params.Bool("brains") {
+		return true
+	}
+	
+	return false
+}
+
+// BrainsCapabilities returns specific BRAINS capabilities that should be enabled.
+func (c *Config) BrainsCapabilities() map[string]bool {
+	result := make(map[string]bool)
+	
+	// Enable all capabilities by default if BRAINS is enabled
+	if c.BrainsEnabled() {
+		result["object_detection"] = true
+		result["aesthetic_scoring"] = true
+		result["scene_understanding"] = true
+		
+		// Override with specific settings if provided
+		if !c.params.Bool("brains-object-detection") {
+			result["object_detection"] = false
+		}
+		
+		if !c.params.Bool("brains-aesthetic-scoring") {
+			result["aesthetic_scoring"] = false
+		}
+		
+		if !c.params.Bool("brains-scene-understanding") {
+			result["scene_understanding"] = false
+		}
+	}
+	
+	return result
+}
+
+// BrainsModelsDownloaded returns true if BRAINS models have been downloaded.
+func (c *Config) BrainsModelsDownloaded() bool {
+	return fs.PathExists(filepath.Join(c.BrainsPath(), "version.txt"))
+}
