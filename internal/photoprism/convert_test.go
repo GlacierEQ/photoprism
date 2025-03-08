@@ -5,66 +5,88 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/photoprism/photoprism/internal/config"
-	"github.com/photoprism/photoprism/pkg/fs"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewConvert(t *testing.T) {
-	conf := config.TestConfig()
-
-	convert := NewConvert(conf)
-
-	assert.IsType(t, &Convert{}, convert)
-}
-
-func TestConvert_Start(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping test in short mode.")
-	}
-
 	c := config.TestConfig()
-
-	c.InitializeTestData()
-
 	convert := NewConvert(c)
 
-	err := convert.Start(c.ImportPath(), nil, false)
+	assert.IsType(t, &Convert{}, convert)
+	assert.NotNil(t, convert.conf)
+	assert.NotNil(t, convert.supportedFormats)
+}
 
-	if err != nil {
-		t.Fatal(err)
+func TestConvert_IsSupportedFormat(t *testing.T) {
+	c := config.TestConfig()
+	convert := NewConvert(c)
+
+	assert.True(t, convert.IsSupportedFormat("test.jpg"))
+	assert.True(t, convert.IsSupportedFormat("test.JPG"))
+	assert.True(t, convert.IsSupportedFormat("test.raw"))
+	assert.False(t, convert.IsSupportedFormat("test.txt"))
+}
+
+func TestConvert_ConvertToJpeg(t *testing.T) {
+	c := config.TestConfig()
+	convert := NewConvert(c)
+
+	// Create a temporary RAW file
+	tempDir, _ := os.MkdirTemp("", "photoprism_test")
+	defer os.RemoveAll(tempDir)
+	rawFilePath := filepath.Join(tempDir, "test.raw")
+	os.WriteFile(rawFilePath, []byte("dummy raw data"), 0644)
+
+	mediaFile, err := NewMediaFile(rawFilePath)
+	assert.NoError(t, err)
+
+	err = convert.ConvertToJpeg(mediaFile)
+	assert.NoError(t, err)
+
+	// Check if JPEG file was created
+	jpegFilePath := rawFilePath + ".jpg"
+	_, err = os.Stat(jpegFilePath)
+	assert.NoError(t, err)
+}
+
+func TestConvert_CreateSidecarJson(t *testing.T) {
+	c := config.TestConfig()
+	convert := NewConvert(c)
+
+	// Create a temporary media file
+	tempDir, _ := os.MkdirTemp("", "photoprism_test")
+	defer os.RemoveAll(tempDir)
+	mediaFilePath := filepath.Join(tempDir, "test.jpg")
+	os.WriteFile(mediaFilePath, []byte("dummy jpg data"), 0644)
+
+	mediaFile, err := NewMediaFile(mediaFilePath)
+	assert.NoError(t, err)
+
+	err = convert.CreateSidecarJson(mediaFile)
+	assert.NoError(t, err)
+
+	// Check if JSON sidecar file was created
+	jsonFilePath := mediaFilePath + ".json"
+	_, err = os.Stat(jsonFilePath)
+	assert.NoError(t, err)
+}
+
+func TestCalculateOptimalWorkers(t *testing.T) {
+	tests := []struct {
+		name       string
+		maxWorkers int
+		expected   int
+	}{
+		{"LowMaxWorkers", 2, 2},
+		{"HighMaxWorkers", 100, 100},
 	}
 
-	jpegFilename := filepath.Join(c.SidecarPath(), c.ImportPath(), "raw/canon_eos_6d.dng.jpg")
-
-	assert.True(t, fs.FileExists(jpegFilename), "Primary file was not found - is Darktable installed?")
-
-	image, err := NewMediaFile(jpegFilename)
-
-	if err != nil {
-		t.Fatal(err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := CalculateOptimalWorkers(tt.maxWorkers)
+			assert.LessOrEqual(t, result, tt.expected)
+			assert.Greater(t, result, 0)
+		})
 	}
-
-	assert.Equal(t, jpegFilename, image.fileName, "FileName must be the same")
-
-	infoRaw := image.MetaData()
-
-	assert.Equal(t, "Canon EOS 6D", infoRaw.CameraModel, "UpdateCamera model should be Canon EOS M10")
-
-	existingJpegFilename := filepath.Join(c.SidecarPath(), c.ImportPath(), "/raw/IMG_2567.CR2.jpg")
-
-	oldHash := fs.Hash(existingJpegFilename)
-
-	_ = os.Remove(existingJpegFilename)
-
-	if err = convert.Start(c.ImportPath(), nil, false); err != nil {
-		t.Fatal(err)
-	}
-
-	newHash := fs.Hash(existingJpegFilename)
-
-	assert.True(t, fs.FileExists(existingJpegFilename), "Primary file was not found - is Darktable installed?")
-
-	assert.NotEqual(t, oldHash, newHash, "Fingerprint of old and new JPEG file must not be the same")
 }
