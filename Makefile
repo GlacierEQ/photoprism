@@ -794,3 +794,226 @@ dummy-ldap:
 
 # Declare all targets as "PHONY", see https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html.
 MAKEFLAGS += --always-make
+
+# PhotoPrism Production Deployment Makefile
+# -----------------------------------------
+# This Makefile provides commands for common production operations
+
+# Variables
+DOCKER_COMPOSE_FILE := docker/docker-compose.prod.yml
+DOCKER_STACK_FILE := docker/docker-stack.yml
+ENV_FILE := docker/.env.prod
+STACK_NAME := photoprism
+GIT_BRANCH := main
+
+# Help command
+.PHONY: help
+help:
+	@echo "PhotoPrism Production Deployment Commands:"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make [command]"
+	@echo ""
+	@echo "Available Commands:"
+	@echo "  deploy-compose     Deploy using Docker Compose"
+	@echo "  deploy-swarm       Deploy using Docker Swarm"
+	@echo "  update             Update deployment to latest version"
+	@echo "  backup             Create a backup"
+	@echo "  restore            Restore from a backup file"
+	@echo "  logs               Show logs from running services"
+	@echo "  status             Check status of services"
+	@echo "  stop               Stop all services"
+	@echo "  restart            Restart all services"
+	@echo "  cleanup            Remove unused containers, networks, and images"
+	@echo "  generate-env       Generate production environment file"
+	@echo "  download-models    Download AI models for BRAINS"
+	@echo "  monitor            Show real-time monitoring dashboard"
+	@echo ""
+
+# Deploy using Docker Compose
+.PHONY: deploy-compose
+deploy-compose:
+	@echo "Deploying PhotoPrism using Docker Compose..."
+	@if [ ! -f $(ENV_FILE) ]; then \
+		echo "Environment file not found. Creating from example..."; \
+		cp docker/.env.example $(ENV_FILE); \
+		echo "Please edit $(ENV_FILE) with your production settings."; \
+		exit 1; \
+	fi
+	./scripts/deploy-production.sh
+
+# Deploy using Docker Swarm
+.PHONY: deploy-swarm
+deploy-swarm:
+	@echo "Deploying PhotoPrism using Docker Swarm..."
+	@if [ ! -f $(ENV_FILE) ]; then \
+		echo "Environment file not found. Creating from example..."; \
+		cp docker/.env.example $(ENV_FILE); \
+		echo "Please edit $(ENV_FILE) with your production settings."; \
+		exit 1; \
+	fi
+	@if ! docker info | grep -q "Swarm: active"; then \
+		echo "Docker Swarm is not active. Initializing..."; \
+		docker swarm init; \
+	fi
+	docker stack deploy -c $(DOCKER_STACK_FILE) --env-file $(ENV_FILE) $(STACK_NAME)
+
+# Update deployment to latest version
+.PHONY: update
+update:
+	@echo "Updating PhotoPrism to latest version..."
+	git fetch
+	git checkout $(GIT_BRANCH)
+	git pull
+	@if docker service ls 2>/dev/null | grep -q $(STACK_NAME); then \
+		make deploy-swarm; \
+	else \
+		make deploy-compose; \
+	fi
+
+# Create a backup
+.PHONY: backup
+backup:
+	@echo "Creating backup..."
+	./scripts/backup-production.sh
+
+# Restore from a backup file
+.PHONY: restore
+restore:
+	@if [ -z "$(BACKUP_FILE)" ]; then \
+		echo "Error: BACKUP_FILE not specified"; \
+		echo "Usage: make restore BACKUP_FILE=backups/photoprism-backup-YYYYMMDD_HHMMSS.tar.gz"; \
+		exit 1; \
+	fi
+	@echo "Restoring from $(BACKUP_FILE)..."
+	./scripts/restore-production.sh $(BACKUP_FILE)
+
+# Show logs
+.PHONY: logs
+logs:
+	@if docker service ls 2>/dev/null | grep -q $(STACK_NAME); then \
+		docker service logs $(STACK_NAME)_photoprism --follow --tail 100; \
+	else \
+		docker compose -f $(DOCKER_COMPOSE_FILE) logs --follow --tail 100; \
+	fi
+
+# Check status
+.PHONY: status
+status:
+	@if docker service ls 2>/dev/null | grep -q $(STACK_NAME); then \
+		echo "Docker Swarm Services:"; \
+		docker service ls | grep $(STACK_NAME); \
+	else \
+		echo "Docker Compose Services:"; \
+		docker compose -f $(DOCKER_COMPOSE_FILE) ps; \
+	fi
+
+# Stop all services
+.PHONY: stop
+stop:
+	@if docker service ls 2>/dev/null | grep -q $(STACK_NAME); then \
+		docker stack rm $(STACK_NAME); \
+	else \
+		docker compose -f $(DOCKER_COMPOSE_FILE) down; \
+	fi
+
+# Restart all services
+.PHONY: restart
+restart:
+	@if docker service ls 2>/dev/null | grep -q $(STACK_NAME); then \
+		make stop; \
+		sleep 5; \
+		make deploy-swarm; \
+	else \
+		docker compose -f $(DOCKER_COMPOSE_FILE) restart; \
+	fi
+
+# Cleanup
+.PHONY: cleanup
+cleanup:
+	@echo "Cleaning up unused Docker resources..."
+	docker system prune -f
+
+# Generate environment file
+.PHONY: generate-env
+generate-env:
+	@echo "Generating production environment file..."
+	@if [ -f $(ENV_FILE) ]; then \
+		echo "Warning: $(ENV_FILE) already exists. Creating $(ENV_FILE).new instead."; \
+		cp docker/.env.example $(ENV_FILE).new; \
+	else \
+		cp docker/.env.example $(ENV_FILE); \
+	fi
+
+# Download AI models
+.PHONY: download-models
+download-models:
+	@echo "Downloading AI models for BRAINS..."
+	./scripts/download-brains.sh
+
+# Monitoring
+.PHONY: monitor
+monitor:
+	@if command -v ctop >/dev/null 2>&1; then \
+		ctop; \
+	else \
+		docker stats; \
+	fi
+
+# PhotoPrism Advanced Build System
+# A sophisticated build system integrating Make, CMake, and Ninja
+
+# Ninja Team targets
+.PHONY: team-deploy
+team-deploy:
+	@echo "Deploying with ninja team..."
+	@TEAM_SIZE=$(NINJA_TEAM_SIZE) DEPLOYMENT_LEVELS=$(NINJA_RECURSION_LEVELS) ./scripts/ninja/ninja-team-deploy.sh
+
+.PHONY: team-init
+team-init:
+	@echo "Initializing ninja team..."
+	@mkdir -p config
+	@if [ ! -f config/ninja-team.yml ]; then \
+		cp scripts/ninja/ninja-team.yml.example config/ninja-team.yml; \
+		echo "Created default ninja team configuration"; \
+	else \
+		echo "Ninja team configuration already exists"; \
+	fi
+	@mkdir -p $(BUILD_DIR)
+	@for i in $$(seq 1 $(NINJA_TEAM_SIZE)); do \
+		mkdir -p $(BUILD_DIR)/ninja-$$i; \
+		echo "Initialized build directory for ninja $$i"; \
+	done
+
+.PHONY: team-clean
+team-clean:
+	@echo "Cleaning ninja team build artifacts..."
+	@for i in $$(seq 1 $(NINJA_TEAM_SIZE)); do \
+		rm -rf $(BUILD_DIR)/ninja-$$i; \
+		echo "Cleaned build directory for ninja $$i"; \
+	done
+
+.PHONY: team-status
+team-status:
+	@echo "Checking ninja team status..."
+	@if [ -f $(BUILD_DIR)/deployment-status.json ]; then \
+		cat $(BUILD_DIR)/deployment-status.json; \
+	else \
+		echo "No deployment status found"; \
+	fi
+	@for i in $$(seq 1 $(NINJA_TEAM_SIZE)); do \
+		if [ -f $(BUILD_DIR)/ninja-$$i/agent-info.json ]; then \
+			echo "Agent $$i:"; \
+			cat $(BUILD_DIR)/ninja-$$i/agent-info.json; \
+		else \
+			echo "Agent $$i: Not initialized"; \
+		fi; \
+	done
+
+.PHONY: team-test
+team-test:
+	@echo "Testing ninja team deployment with minimal configuration..."
+	@TEAM_SIZE=2 DEPLOYMENT_LEVELS=2 BUILD_MODE="sequential" ./scripts/ninja/ninja-team-deploy.sh
+
+# Include custom targets
+include scripts/ninja/custom.mk
