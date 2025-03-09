@@ -1,0 +1,88 @@
+name: BRAINS Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'internal/brains/**'
+      - 'cmd/**brains**'
+      - 'scripts/**brains**'
+      - 'docker/**'
+      - '.github/workflows/brains-integration.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'internal/brains/**'
+      - 'cmd/**brains**'
+      - 'scripts/**brains**'
+      - 'docker/**'
+      - '.github/workflows/brains-integration.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Test BRAINS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopenblas-dev libtensorflow2
+          
+      - name: Build with BRAINS support
+        run: |
+          go build -tags="brains" -o photoprism cmd/photoprism/photoprism.go
+
+      - name: Download BRAINS models
+        run: |
+          chmod +x scripts/download-brains.sh
+          ./scripts/download-brains.sh
+
+      - name: Run BRAINS tests
+        run: |
+          go test -tags="brains" ./internal/brains/... -v
+          
+      - name: Test Docker build
+        run: |
+          cd docker/photoprism
+          docker build -t photoprism/photoprism:brains-test .
+          
+      - name: Verify Docker image
+        run: |
+          docker run --rm photoprism/photoprism:brains-test photoprism brains status
+
+  deploy-docs:
+    name: Deploy BRAINS Documentation
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Build documentation
+        run: |
+          # This is where you would build your documentation
+          echo "Building BRAINS documentation"
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          destination_dir: brains
