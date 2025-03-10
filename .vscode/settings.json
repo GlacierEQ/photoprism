@@ -1,4 +1,4 @@
-{``
+{
     "// DeepSoul Supreme Optimization Protocol": "Configuration for enhanced GitHub Copilot performance",
     "github.copilot.enable": true,
     "github.copilot.advanced": {
@@ -7,89 +7,142 @@
         "multiPassRefinement": true,
         "optimizedResourceAllocation": true,
         "universalCompatibility": true,
-        "maxCodeLength": 1000,
-        "maxTokens": 2048
+        "maxCodeLength": 2500,
+        "maxTokens": 4096
     },
     "github.copilot.chat.codeGeneration.instructions": [
-        "Generate code with full understanding of surrounding context.",
-        "Ensure all functions and objects interact seamlessly.",
-        "Follow SOLID principles and DRY methodology in all generated code.",
-        "Create production-ready code with proper error handling and validation.",
-        "Implement automated performance benchmarks where appropriate.",
-        "Use environment variables/config files instead of hardcoded values.",
-        "Enforce input sanitization and security best practices.",
-        "Use async/await for asynchronous operations.",
-        "Implement logging and monitoring for critical components."
+        {"text": "Generate code with full understanding of surrounding context."},
+        {"text": "Ensure all functions and objects interact seamlessly."},
+        {"text": "Follow SOLID principles and DRY methodology in all generated code."},
+        {"text": "Create production-ready code with proper error handling and validation."},
+        {"text": "Implement automated performance benchmarks where appropriate."},
+        {"text": "Use environment variables/config files instead of hardcoded values."},
+        {"text": "Enforce input sanitization and security best practices."},
+        {"text": "Use async/await for asynchronous operations."},
+        {"text": "Implement logging and monitoring for critical components."}
     ],
     "github.copilot.chat.reviewSelection.instructions": [
-        "Ensure AI-generated code follows SOLID principles.",
-        "Identify and remove redundant calculations.",
-        "Enforce best security practices (sanitization, auth checks).",
-        "Check for potential memory leaks in resource management.",
-        "Verify cross-platform compatibility of suggested code.",
-        "Check for potential performance bottlenecks.",
-        "Verify code adheres to project coding standards."
+        {"text": "Ensure AI-generated code follows SOLID principles."},
+        {"text": "Identify and remove redundant calculations."},
+        {"text": "Enforce best security practices (sanitization, auth checks)."},
+        {"text": "Check for potential memory leaks in resource management."},
+        {"text": "Verify cross-platform compatibility of suggested code."},
+        {"text": "Check for potential performance bottlenecks."},
+        {"text": "Verify code adheres to project coding standards."}
     ],
     "github.copilot.chat.commitMessageGeneration.instructions": [
-        "Create descriptive, concise commit messages.",
-        "Include the scope of changes in the commit message.",
-        "Follow conventional commit format where appropriate.",
-        "Ensure that commits pass stability tests before submission.",
-        "Include relevant issue numbers or references."
+        {"text": "Create descriptive, concise commit messages."},
+        {"text": "Include the scope of changes in the commit message."},
+        {"text": "Follow conventional commit format where appropriate."},
+        {"text": "Ensure that commits pass stability tests before submission."},
+        {"text": "Include relevant issue numbers or references."}
     ],
+
+    // Editor settings
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.fixAll": true,
         "source.organizeImports": true
     },
+    "editor.guides.bracketPairs": "active",
+    "editor.bracketPairColorization.enabled": true,
+    "editor.linkedEditing": true,
+    "editor.tabCompletion": "on",
+    "editor.suggest.shareSuggestSelections": true,
+    "editor.inlineSuggest.enabled": true,
+    "editor.unicodeHighlight.invisibleCharacters": true,
+    "editor.detectIndentation": false,
+
+    // Debug settings
+    "debug.inlineValues": true,
+    "debug.toolBarLocation": "docked",
+
+    // Workbench settings
+    "workbench.colorTheme": "Default Dark+",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.editor.limit.enabled": true,
+    "workbench.editor.limit.value": 10,
+
+    // Explorer settings
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
         "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.test.ts",
         "*.go": "${capture}_test.go",
         "*.sh": "${capture}.bash, ${capture}.ps1"
     },
+
+    // Files settings
+    "files.exclude": {
+        "**/.git": true,
+        "**/node_modules": true,
+        "**/dist": true
+    },
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+
+    // Git settings
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+
+    // Terminal settings
     "terminal.integrated.env.linux": {
         "PHOTOPRISM_EXPERIMENTAL": "true",
         "PHOTOPRISM_THUMB_FILTER": "lanczos",
-        "PHOTOPRISM_THUMB_QUALITY": "90"
+        "PHOTOPRISM_THUMB_QUALITY": "90",
+        "PHOTOPRISM_DEBUG": "false"
     },
     "terminal.integrated.env.osx": {
         "PHOTOPRISM_EXPERIMENTAL": "true",
         "PHOTOPRISM_THUMB_FILTER": "lanczos",
-        "PHOTOPRISM_THUMB_QUALITY": "90"
+        "PHOTOPRISM_THUMB_QUALITY": "90",
+        "PHOTOPRISM_DEBUG": "false"
     },
     "terminal.integrated.env.windows": {
         "PHOTOPRISM_EXPERIMENTAL": "true",
         "PHOTOPRISM_THUMB_FILTER": "lanczos",
-        "PHOTOPRISM_THUMB_QUALITY": "90"
-    }
+        "PHOTOPRISM_THUMB_QUALITY": "90",
+        "PHOTOPRISM_DEBUG": "false"
+    },
+
+    // Testing settings
+    "testing.automaticallyOpenPeekView": "onlyFails",
+
+    // Diff settings
+    "diffEditor.ignoreTrimWhitespace": false,
+
+    // Extensions settings
+    "extensions.ignoreRecommendations": false,
+    "extensions.autoUpdate": true,
+
+    // Security settings
+    "security.workspace.trust.untrustedFiles": "prompt",
+
+    // Language specific settings
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 2,
+        "debug.inlineValues": true,
+        "debug.toolBarLocation": "docked"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 2
+    },
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.python"
+    },
+
+    // PhotoPrism specific settings
+    "photoprism.server.url": "${env:PHOTOPRISM_SERVER_URL}",
+    "photoprism.storage.path": "${workspaceFolder}/storage",
+    "photoprism.import.path": "${workspaceFolder}/import"
+}
 ```
-
-# DeepSoul Supreme Optimization Protocol
-The DeepSoul Supreme Optimization Protocol is a set of configurations designed to enhance the performance of GitHub Copilot, an AI-powered code completion tool. By enabling these settings, you can improve the quality and efficiency of the code generated by Copilot, ensuring that it follows best practices and coding standards. The protocol includes advanced features such as context awareness, adaptive code expansion, and optimized resource allocation, as well as guidelines for code generation, code review, and commit message generation. By following these recommendations, you can leverage the full potential of Copilot and streamline your development workflow.
-
-## Configuration Settings
-The DeepSoul Supreme Optimization Protocol includes the following configuration settings for GitHub Copilot:
-
-- `github.copilot.enable`: Enable GitHub Copilot to provide code suggestions.
-- `github.copilot.advanced`: Advanced settings for Copilot optimization.
-  - `enableContextAwareness`: Enable context awareness for code generation.
-  - `adaptiveCodeExpansion`: Enable adaptive code expansion for complex tasks.
-  - `multiPassRefinement`: Enable multi-pass refinement for code accuracy.
-  - `optimizedResourceAllocation`: Optimize resource allocation for efficient code generation.
-  - `universalCompatibility`: Ensure compatibility across different platforms.
-- `github.copilot.chat.codeGeneration.instructions`: Guidelines for code generation.
-- `github.copilot.chat.reviewSelection.instructions`: Guidelines for code review.
-- `github.copilot.chat.commitMessageGeneration.instructions`: Guidelines for commit message generation.
-- `editor.formatOnSave`: Automatically format code on save.
-- `editor.codeActionsOnSave`: Enable code actions on save.
-- `explorer.fileNesting.enabled`: Enable file nesting in the Explorer.
-- `explorer.fileNesting.patterns`: Patterns for file nesting.
-- `terminal.integrated.env.linux`: Environment variables for Linux.
-- `terminal.integrated.env.osx`: Environment variables for macOS.
-- `terminal.integrated.env.windows`: Environment variables for Windows.
-
-## Usage
-To apply the DeepSoul Supreme Optimization Protocol to your VS Code settings, copy the configuration settings provided above and paste them into your `.vscode/settings.json` file. Once you have saved the changes, restart VS Code to enable the new settings. You can now enjoy enhanced GitHub Copilot performance and take advantage of the advanced features and guidelines included in the protocol.
-
-By following the DeepSoul Supreme Optimization Protocol, you can optimize your development workflow, improve code quality, and

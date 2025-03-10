@@ -3,8 +3,8 @@ version: "1.0"
 
 # Global team settings
 team:
-  size: 4
-  recursion_levels: 3
+  size: 6
+  recursion_levels: 5
   build_mode: "parallel"
   coordination_strategy: "distributed"
   retry_failed: true
@@ -61,11 +61,11 @@ deployment:
     - name: "development"
       docker_compose_file: "docker/docker-compose.yml"
       env_file: "docker/.env.example"
-    
+
     - name: "staging"
       docker_compose_file: "docker/docker-compose.yml"
       env_file: "docker/.env.staging"
-    
+
     - name: "production"
       docker_compose_file: "docker/docker-compose.prod.yml"
       env_file: "docker/.env.prod"

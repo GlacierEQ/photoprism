@@ -39,7 +39,10 @@ export default class Page {
     if (action === "delete") {
       await t.click(Selector("button.action-confirm"));
     }
-    if ((action === "album") | (action === "clone")) {
+    if ((action === "album") || (action === "clone")) {
+      await t.typeText(Selector(".input-album input"), albumName, { replace: true });
+    }
+    if ((action === "album") || (action === "clone")) {
       await t.typeText(Selector(".input-album input"), albumName, { replace: true });
       if (await Selector("div").withText(albumName).parent('div[role="option"]').visible) {
         await t.click(Selector("div").withText(albumName).parent('div[role="option"]'));

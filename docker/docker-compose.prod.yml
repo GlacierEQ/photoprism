@@ -1,5 +1,5 @@
 # Production Docker Compose configuration for PhotoPrism with BRAINS
-version: '3.8'
+version: "3.8"
 
 networks:
   photoprism_net:
@@ -45,28 +45,24 @@ services:
       PHOTOPRISM_DETECT_NSFW: "${PHOTOPRISM_DETECT_NSFW:-false}"
       PHOTOPRISM_UPLOAD_NSFW: "${PHOTOPRISM_UPLOAD_NSFW:-true}"
       PHOTOPRISM_LOG_LEVEL: "${PHOTOPRISM_LOG_LEVEL:-info}"
+      PHOTOPRISM_LOG_FORMAT: "${PHOTOPRISM_LOG_FORMAT:-json}"
       PHOTOPRISM_READONLY: "${PHOTOPRISM_READONLY:-false}"
       PHOTOPRISM_EXPERIMENTAL: "${PHOTOPRISM_EXPERIMENTAL:-false}"
-      PHOTOPRISM_WORKERS: "${PHOTOPRISM_WORKERS:-3}" # Automatic
-      PHOTOPRISM_THUMB_SIZE: "${PHOTOPRISM_THUMB_SIZE:-2048}"
-      PHOTOPRISM_THUMB_LIMIT: "${PHOTOPRISM_THUMB_LIMIT:-1000}"
+      PHOTOPRISM_WORKERS: "${PHOTOPRISM_WORKERS:-4}" # Increased from 3
+      PHOTOPRISM_THUMB_SIZE: "${PHOTOPRISM_THUMB_SIZE:-3840}" # Increased for 4K displays
+      PHOTOPRISM_THUMB_LIMIT: "${PHOTOPRISM_THUMB_LIMIT:-2000}" # Increased from 1000
       PHOTOPRISM_THUMB_UNCACHED: "${PHOTOPRISM_THUMB_UNCACHED:-false}"
-      PHOTOPRISM_JPEG_QUALITY: "${PHOTOPRISM_JPEG_QUALITY:-85}"
+      PHOTOPRISM_JPEG_QUALITY: "${PHOTOPRISM_JPEG_QUALITY:-90}" # Slightly higher quality
+      PHOTOPRISM_THUMB_FILTER: "${PHOTOPRISM_THUMB_FILTER:-lanczos}"
+      PHOTOPRISM_CPU_LIMIT: "${PHOTOPRISM_CPU_LIMIT:-4}"
+      PHOTOPRISM_MEMORY_LIMIT: "${PHOTOPRISM_MEMORY_LIMIT:-6G}"
     volumes:
       - "${PHOTOPRISM_STORAGE_PATH:-./storage}:/photoprism/storage"
       - "${PHOTOPRISM_ORIGINALS_PATH:-./originals}:/photoprism/originals"
       - "${PHOTOPRISM_IMPORT_PATH:-./import}:/photoprism/import"
-    deploy:
-      resources:
-        limits:
-          cpus: "${PHOTOPRISM_CPU_LIMIT:-2}"
-          memory: "${PHOTOPRISM_MEMORY_LIMIT:-2G}"
-        reservations:
-          cpus: "${PHOTOPRISM_CPU_RESERVATION:-0.5}"
-          memory: "${PHOTOPRISM_MEMORY_RESERVATION:-512M}"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:2342/api/v1/status" ]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:2342/api/v1/status"]
+      interval: 60s
       timeout: 10s
       retries: 3
 
@@ -78,22 +74,15 @@ services:
       - photoprism_net
     environment:
       BRAINS_LOG_LEVEL: "${BRAINS_LOG_LEVEL:-info}"
-      BRAINS_WORKERS: "${BRAINS_WORKERS:-2}"
-      BRAINS_READ_TIMEOUT: "${BRAINS_READ_TIMEOUT:-60s}"
       BRAINS_WRITE_TIMEOUT: "${BRAINS_WRITE_TIMEOUT:-60s}"
+      BRAINS_WORKERS: "${BRAINS_WORKERS:-4}"
+      BRAINS_CPU_LIMIT: "${BRAINS_CPU_LIMIT:-2}"
+      BRAINS_MEMORY_LIMIT: "${BRAINS_MEMORY_LIMIT:-2G}"
     volumes:
       - "${PHOTOPRISM_STORAGE_PATH:-./storage}/brains:/brains/data"
-    deploy:
-      resources:
-        limits:
-          cpus: "${BRAINS_CPU_LIMIT:-1}"
-          memory: "${BRAINS_MEMORY_LIMIT:-1G}"
-        reservations:
-          cpus: "${BRAINS_CPU_RESERVATION:-0.2}"
-          memory: "${BRAINS_MEMORY_RESERVATION:-256M}"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/status" ]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/status"]
+      interval: 60s
       timeout: 5s
       retries: 3
 
@@ -103,7 +92,7 @@ services:
     restart: unless-stopped
     networks:
       - photoprism_net
-    command: mariadbd --innodb-buffer-pool-size=${DB_BUFFER_POOL_SIZE:-256M} --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
+    command: mariadbd --innodb-buffer-pool-size=${DB_BUFFER_POOL_SIZE:-256M} --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=${DB_MAX_CONNECTIONS:-512} --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
     environment:
       MARIADB_AUTO_UPGRADE: "1"
       MARIADB_INITDB_SKIP_TZINFO: "1"
@@ -113,16 +102,8 @@ services:
       MARIADB_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-photoprism}"
     volumes:
       - "${PHOTOPRISM_DATABASE_PATH:-./database}:/var/lib/mysql"
-    deploy:
-      resources:
-        limits:
-          cpus: "${DB_CPU_LIMIT:-1}"
-          memory: "${DB_MEMORY_LIMIT:-1G}"
-        reservations:
-          cpus: "${DB_CPU_RESERVATION:-0.2}"
-          memory: "${DB_MEMORY_RESERVATION:-256M}"
     healthcheck:
-      test: [ "CMD", "mariadb-admin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -135,13 +116,27 @@ services:
       - photoprism_net
     volumes:
       - "${PHOTOPRISM_REDIS_PATH:-./redis}:/data"
-    deploy:
-      resources:
-        limits:
-          cpus: "${REDIS_CPU_LIMIT:-0.5}"
-          memory: "${REDIS_MEMORY_LIMIT:-256M}"
+    command: redis-server --save 3600 1 --loglevel warning --maxmemory ${REDIS_MAXMEMORY:-128mb} --maxmemory-policy ${REDIS_MAXMEMORY_POLICY:-allkeys-lru}
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 3
+
+  # Optional backup service (uncomment to enable)
+  # backup:
+  #   image: postgres:14-alpine
+  #   container_name: photoprism_backup
+  #   restart: unless-stopped
+  #   networks:
+  #     - photoprism_net
+  #   environment:
+  #     TZ: "${TZ:-UTC}"
+  #   volumes:
+  #     - "${PHOTOPRISM_STORAGE_PATH}:/source/storage:ro"
+  #     - "${PHOTOPRISM_DATABASE_PATH}:/source/database:ro"
+  #     - "${PHOTOPRISM_BACKUP_PATH:-./backups}:/backups"
+  #   command: |
+  #     sh -c 'mkdir -p /backups/$(date +%Y-%m-%d) &&
+  #            tar -czf /backups/$(date +%Y-%m-%d)/database.tar.gz -C /source database &&
+  #            tar -czf /backups/$(date +%Y-%m-%d)/storage.tar.gz -C /source storage'

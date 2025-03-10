@@ -23,14 +23,16 @@ Additional information can be found in our Developer Guide:
 
 */
 
+import * as auth from "options/auth";
+
+import { $gettext, T } from "common/gettext";
+
+import $api from "common/api";
+import { $config } from "app/session";
+import $util from "common/util";
+import { Form } from "common/form";
 import RestModel from "model/rest";
 import memoizeOne from "memoize-one";
-import * as auth from "options/auth";
-import $util from "common/util";
-import $api from "common/api";
-import { T, $gettext } from "common/gettext";
-import { Form } from "common/form";
-import { $config } from "app/session";
 
 export class User extends RestModel {
   getDefaults() {
@@ -252,7 +254,7 @@ export class User extends RestModel {
       providerName = $util.capitalize(this.AuthProvider);
     }
 
-    if (!this.AuthMethod || this.AuthMethod === "" || this.AuthMethod === "default") {
+    if (!this.AuthMethod || this.AuthMethod === "default") {
       return providerName;
     }
 

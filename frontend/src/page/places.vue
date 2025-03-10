@@ -95,17 +95,18 @@ export default {
     };
 
     const settings = this.$config.getSettings();
+    if (!settings) {
+      return;
+    }
 
-    if (settings) {
-      const features = settings.features;
+    const features = settings.features || {};
 
-      if (features.private) {
-        filter.public = "true";
-      }
+    if (features.private) {
+      filter.public = "true";
+    }
 
-      if (features.review && (!this.staticFilter || !("quality" in this.staticFilter))) {
-        filter.quality = "3";
-      }
+    if (features.review && (!this.staticFilter || !("quality" in this.staticFilter))) {
+      filter.quality = "3";
     }
 
     return {

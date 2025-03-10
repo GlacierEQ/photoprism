@@ -20,12 +20,12 @@ export default class Page {
       await t.click(Selector(".nav-" + page));
     } else {
       if (
-        (page === "monochrome") |
-        (page === "panoramas") |
-        (page === "stacks") |
-        (page === "scans") |
-        (page === "review") |
-        (page === "private") |
+        (page === "monochrome") ||
+        (page === "panoramas") ||
+        (page === "stacks") ||
+        (page === "scans") ||
+        (page === "review") ||
+        (page === "private") ||
         (page === "archive")
       ) {
         if (!(await Selector("div.v-list-group--open a.nav-browse").visible)) {
@@ -39,11 +39,11 @@ export default class Page {
         if (!(await Selector("div.v-list-group--open a.nav-places").visible)) {
           await t.click(Selector("div.nav-places .mdi-chevron-down"));
         }
-      } else if ((page === "originals") | (page === "hidden") | (page === "errors")) {
+      } else if ((page === "originals") || (page === "hidden") || (page === "errors")) {
         if (!(await Selector("div.v-list-group--open a.nav-library").visible)) {
           await t.click(Selector("div.nav-library .mdi-chevron-down"));
         }
-      } else if ((page === "about") | (page === "feedback") | (page === "license")) {
+      } else if ((page === "about") || (page === "feedback") || (page === "license")) {
         if (!(await Selector("div.v-list-group--open a.nav-settings").visible)) {
           await t.click(Selector("div.nav-settings .mdi-chevron-down"));
         }
@@ -61,16 +61,16 @@ export default class Page {
       await t.wait(5000);
     }
     if (
-      (page === "monochrome") |
-      (page === "panoramas") |
-      (page === "stacks") |
-      (page === "scans") |
-      (page === "review") |
-      (page === "private") |
+      (page === "monochrome") ||
+      (page === "panoramas") ||
+      (page === "stacks") ||
+      (page === "scans") ||
+      (page === "review") ||
+      (page === "private") ||
       (page === "archive")
     ) {
       if (
-        !(await Selector("div.v-list-group--open div.nav-browse", { timeout: 15000 }).visible) &
+        !(await Selector("div.v-list-group--open div.nav-browse", { timeout: 15000 }).visible) &&
         (await Selector("div.nav-browse .mdi-chevron-down", { timeout: 15000 }).visible)
       ) {
         await t.click(Selector("div.nav-browse .mdi-chevron-down", { timeout: 15000 }));
@@ -78,7 +78,7 @@ export default class Page {
     } else if (page === "live") {
       if (await Selector(".nav-video").visible) {
         if (
-          !(await Selector("div.v-list-group--open div.nav-video").visible) &
+          !(await Selector("div.v-list-group--open div.nav-video").visible) &&
           (await Selector("div.nav-video .mdi-chevron-down", { timeout: 15000 }).visible)
         ) {
           await t.click(Selector("div.nav-video .mdi-chevron-down"));
@@ -87,13 +87,13 @@ export default class Page {
     } else if (page === "states") {
       if (await Selector(".nav-places").visible) {
         if (
-          !(await Selector("div.v-list-group--open div.nav-places").visible) &
+          !(await Selector("div.v-list-group--open div.nav-places").visible) &&
           (await Selector("div.nav-places .mdi-chevron-down", { timeout: 15000 }).visible)
         ) {
           await t.click(Selector("div.nav-places .mdi-chevron-down"));
         }
       }
-    } else if ((page === "originals") | (page === "hidden") | (page === "errors")) {
+    } else if ((page === "originals") || (page === "hidden") || (page === "errors")) {
       if (await Selector(".nav-library").visible) {
         if (!(await Selector("div.v-list-group--open div.nav-library").visible)) {
           if (await Selector("div.nav-library .mdi-chevron-down").visible) {
@@ -101,10 +101,10 @@ export default class Page {
           }
         }
       }
-    } else if ((page === "abouts") | (page === "feedback") | (page === "license")) {
+    } else if ((page === "about") || (page === "feedback") || (page === "license")) {
       if (await Selector(".nav-settings").visible) {
         if (
-          !(await Selector("div.v-list-group--open div.nav-settings").visible) &
+          !(await Selector("div.v-list-group--open div.nav-settings").visible) &&
           (await Selector("div.nav-settings .mdi-chevron-down", { timeout: 15000 }).visible)
         ) {
           await t.click(Selector("div.nav-settings .mdi-chevron-down"));

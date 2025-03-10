@@ -135,16 +135,18 @@ export default {
     };
 
     const settings = this.$config.getSettings();
-    const features = settings.features;
+    if (!settings) {
+      return;
+    }
 
-    if (settings) {
-      if (features.private) {
-        filter.public = "true";
-      }
+    const features = settings.features || {};
 
-      if (features.review && (!this.staticFilter || !("quality" in this.staticFilter))) {
-        filter.quality = "3";
-      }
+    if (features.private) {
+      filter.public = "true";
+    }
+
+    if (features.review && (!this.staticFilter || !("quality" in this.staticFilter))) {
+      filter.quality = "3";
     }
 
     const batchSize = Photo.batchSize();

@@ -23,14 +23,15 @@ Additional information can be found in our Developer Guide:
 
 */
 
+import * as can from "common/can";
+import * as media from "common/media";
+
 import { $config } from "app/session";
-import { DATE_FULL } from "model/photo";
-import sanitizeHtml from "sanitize-html";
-import { DateTime } from "luxon";
 import { $gettext } from "common/gettext";
 import $notify from "common/notify";
-import * as media from "common/media";
-import * as can from "common/can";
+import { DateTime } from "luxon";
+import { DATE_FULL } from "model/photo";
+import sanitizeHtml from "sanitize-html";
 
 const Nanosecond = 1;
 const Microsecond = 1000 * Nanosecond;
@@ -276,19 +277,19 @@ export default class $util {
   }
 
   static capitalize(s) {
-    if (!s || s === "") {
-      return "";
-    }
-
-    return s.replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
-  }
-
-  static ucFirst(s) {
-    if (!s || s === "") {
+    if (!s) {
       return "";
     }
 
     return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  static ucFirst(s) {
+    if (!s) {
+      return "";
+    }
+
+    return s.split(" ").map(Util.capitalize).join(" ");
   }
 
   static generateToken() {

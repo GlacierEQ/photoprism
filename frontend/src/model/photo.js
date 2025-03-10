@@ -23,20 +23,21 @@ Additional information can be found in our Developer Guide:
 
 */
 
-import memoizeOne from "memoize-one";
-import RestModel from "model/rest";
+import * as media from "common/media";
+import * as src from "common/src";
+
+import $api from "common/api";
+import { $config } from "app/session";
+import { $gettext } from "common/gettext";
+import $util from "common/util";
+import { DateTime } from "luxon";
 import File from "model/file";
 import Marker from "model/marker";
-import { DateTime } from "luxon";
-import { $config } from "app/session";
-import $api from "common/api";
-import $util from "common/util";
-import countries from "options/countries.json";
-import { $gettext } from "common/gettext";
 import { PhotoClipboard } from "common/clipboard";
+import RestModel from "model/rest";
+import countries from "options/countries.json";
 import download from "common/download";
-import * as src from "common/src";
-import * as media from "common/media";
+import memoizeOne from "memoize-one";
 
 export const YearUnknown = -1;
 export const MonthUnknown = -1;
@@ -710,8 +711,8 @@ export class Photo extends RestModel {
     const s = $config.getSettings();
 
     if (!s || !s.features || !s.download || !s.features.download || s.download.disabled) {
-      console.log("download: disabled in settings", s.features, s.download);
-      return;
+      console.log("download: disabled in settings", s?.features, s?.download);
+      return Promise.resolve();
     }
 
     const token = $config.downloadToken;
@@ -926,7 +927,7 @@ export class Photo extends RestModel {
       info.push($util.formatDuration(file.Duration));
     }
 
-    if (file.Codec) {
+    if (file && file.Width && file.Codec) {
       info.push($util.formatCodec(file.Codec));
     } else if (file.FileType) {
       info.push($util.formatCodec(file.FileType));

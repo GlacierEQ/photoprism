@@ -132,7 +132,7 @@ export class rules {
       return false;
     }
 
-    return -91 < lat < 91;
+    return -91 < lat && lat < 91;
   }
 
   static isLng(v) {
@@ -146,7 +146,15 @@ export class rules {
       return false;
     }
 
-    return -181 < lng < 181;
+    return -181 < lng && lng < 181;
+  }
+
+  isLng(lng) {
+    if (!lng) {
+      return false;
+    }
+
+    return -181 < lng && lng < 181;
   }
 
   static isNumber(v) {

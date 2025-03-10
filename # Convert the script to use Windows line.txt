@@ -1,0 +1,2 @@
+# Convert the script to use Windows line endings if needed
+(Get-Content -Path "C:\Users\casey\OneDrive\Documents\GitHub\photoprism2\scripts\deploy-production.sh" -Raw).Replace("`n", "`r`n") | Set-Content -Path "C:\Users\casey\OneDrive\Documents\GitHub\photoprism2\scripts\deploy-production.sh" -NoNewline

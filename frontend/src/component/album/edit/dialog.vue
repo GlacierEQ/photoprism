@@ -63,7 +63,7 @@
               <v-combobox
                 v-model="category"
                 class="input-category"
-                :search.sync="category"
+                v-model:search="category"
                 :items="categories"
                 :disabled="disabled"
                 :label="$gettext('Category')"

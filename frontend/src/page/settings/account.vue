@@ -448,7 +448,7 @@ export default {
       return this.onChange();
     },
     onChange() {
-      if (this.busy || !this?.$refs?.form) {
+      if (this.busy || !this.$refs || !this.$refs.form) {
         return;
       }
 

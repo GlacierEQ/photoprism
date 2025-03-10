@@ -23,10 +23,10 @@ Additional information can be found in our Developer Guide:
 
 */
 
-import Model from "model.js";
-import $api from "common/api";
 import { $config } from "app/session.js";
+import $api from "common/api";
 import { $gettext } from "common/gettext";
+import Model from "model.js";
 
 const thumbs = window.__CONFIG__.thumbs;
 
@@ -111,11 +111,15 @@ export class Thumb extends Model {
   }
 
   static fromPhoto(photo) {
-    if (photo.Files) {
+    if (!photo) {
+      return this.notFound();
+    }
+
+    if (photo.primaryFile) {
       return this.fromFile(photo, photo.primaryFile());
     }
 
-    if (!photo || !photo.Hash) {
+    if (!photo.Hash) {
       return this.notFound();
     }
 

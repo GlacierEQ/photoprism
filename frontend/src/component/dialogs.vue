@@ -95,11 +95,14 @@ export default {
         return;
       }
 
-      this.edit.index = data.index;
-      this.edit.selection = data.selection;
-      this.edit.album = data.album;
-      this.edit.tab = data?.tab ? data.tab : "";
-      this.edit.visible = true;
+      // Add proper null checks before accessing data properties
+      if (data) {
+        this.edit.index = data.index || 0;
+        this.edit.selection = data.selection || [];
+        this.edit.album = data.album || null;
+        this.edit.tab = data.tab || "";
+        this.edit.visible = true;
+      }
     },
     closeEditDialog() {
       if (this.edit.visible) {

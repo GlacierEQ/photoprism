@@ -29,7 +29,7 @@
             item-title="Title"
             item-value="UID"
             class="input-album"
-            @keyup.enter.native="confirm"
+            @keyup.enter="confirm"
           >
           </v-combobox>
         </v-card-text>

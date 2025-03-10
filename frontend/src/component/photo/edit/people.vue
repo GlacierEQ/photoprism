@@ -84,7 +84,7 @@
                 class="input-name pa-0 ma-0"
                 @blur="onSetName(m)"
                 @update:model-value="(person) => onSetPerson(m, person)"
-                @keyup.enter.native="onSetName(m)"
+                @keyup.enter="onSetName(m)"
               >
               </v-combobox>
             </v-card-actions>

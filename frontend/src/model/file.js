@@ -23,14 +23,15 @@ Additional information can be found in our Developer Guide:
 
 */
 
-import RestModel from "model/rest";
-import { DateTime } from "luxon";
-import { $config } from "app/session";
-import { $gettext } from "common/gettext";
-import download from "common/download";
 import * as media from "common/media";
+
+import { $config } from "app/session";
 import $api from "common/api";
+import download from "common/download";
+import { $gettext } from "common/gettext";
 import $util from "common/util";
+import { DateTime } from "luxon";
+import RestModel from "model/rest";
 
 export class File extends RestModel {
   getDefaults() {
@@ -187,7 +188,7 @@ export class File extends RestModel {
   }
 
   storageInfo() {
-    if (!this.Root || this.Root === "") {
+    if (!this.Root) {
       return "";
     }
 

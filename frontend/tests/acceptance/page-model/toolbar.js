@@ -15,12 +15,10 @@ export default class Page {
 
   async checkToolbarActionAvailability(action, visible) {
     if (
-      (t.browser.platform === "mobile") &
-      (action !== "edit") &
-      (action !== "share") &
-      (action !== "add") &
-      (action !== "show-all") &
-      (action !== "show-important")
+      (t.browser.platform === "mobile") &&
+      (action !== "edit") &&
+      (action !== "login") &&
+      (action !== "logout")
     ) {
       if (await this.openMobileToolbar.exists) {
         await t.click(this.openMobileToolbar);
@@ -36,11 +34,11 @@ export default class Page {
 
   async checkMobileMenuActionAvailability(action, visible) {
     if (
-      (action !== "login") &
-      (action !== "logout") &
-      (action !== "reload") &
-      (action !== "logs") &
-      (action !== "upload") &
+      (action !== "login") &&
+      (action !== "logout") &&
+      (action !== "reload") &&
+      (action !== "logs") &&
+      (action !== "upload") &&
       (action !== "settings")
     ) {
       if (visible) {
@@ -59,11 +57,11 @@ export default class Page {
 
   async triggerMobileMenuAction(action) {
     if (
-      (action !== "login") &
-      (action !== "logout") &
-      (action !== "reload") &
-      (action !== "logs") &
-      (action !== "upload") &
+      (action !== "login") &&
+      (action !== "logout") &&
+      (action !== "reload") &&
+      (action !== "logs") &&
+      (action !== "upload") &&
       (action !== "settings")
     ) {
       await t.click(Selector("#mobile-menu div.nav-" + action + " a"));
@@ -74,11 +72,11 @@ export default class Page {
 
   async triggerToolbarAction(action) {
     if (
-      (t.browser.platform === "mobile") &
-      (action !== "edit") &
-      (action !== "share") &
-      (action !== "add") &
-      (action !== "show-all") &
+      (t.browser.platform === "mobile") &&
+      (action !== "edit") &&
+      (action !== "share") &&
+      (action !== "add") &&
+      (action !== "show-all") &&
       (action !== "show-important")
     ) {
       if (await this.openMobileToolbar.exists) {

@@ -40,7 +40,7 @@
                 flat
                 autocomplete="off"
                 :hint="$gettext('Folder')"
-                :search.sync="search"
+                v-model:search="search"
                 :items="pathItems"
                 :loading="loading"
                 item-title="abs"
@@ -82,7 +82,7 @@
                 flat
                 autocomplete="off"
                 :hint="$gettext('Folder')"
-                :search.sync="search"
+                v-model:search="search"
                 :items="pathItems"
                 :loading="loading"
                 item-title="abs"

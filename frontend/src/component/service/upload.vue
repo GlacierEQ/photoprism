@@ -38,7 +38,7 @@
                 hide-no-data
                 autocomplete="off"
                 :hint="$gettext('Folder')"
-                :search.sync="search"
+                v-model:search="search"
                 :items="pathItems"
                 :loading="loading"
                 :disabled="loading || noServices"

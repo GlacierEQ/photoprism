@@ -439,6 +439,10 @@ export default {
       // Get the slide model.
       const model = this.models[i];
 
+      if (!model || !model.Thumbs || !model.Thumbs[thumbSize]) {
+        return;
+      }
+
       // Get the estimated slide (viewport) size in real pixels.
       const pixels = this.getSlidePixels(model);
 
@@ -450,20 +454,20 @@ export default {
         src: model.Thumbs[thumbSize].src,
         width: model.Thumbs[thumbSize].w,
         height: model.Thumbs[thumbSize].h,
-        alt: model?.Title,
+        alt: model.Title || "",
         model: model,
         loading: false,
       };
 
       // Check if content is playable and return the data needed to render it in "contentLoad".
-      if (model?.Playable && model?.Hash) {
+      if (model.Playable && model.Hash) {
         /*
           TODO: The server should (additionally) provide a video/animation still from time index 0 that can be used as
                 poster (the current thumbnail is taken later for longer videos, since the first frame is often black).
          */
 
         // Check the duration so that short videos can be looped, unless a slideshow is playing.
-        const isShort = model?.Duration
+        const isShort = model.Duration
           ? model.Duration > 0 && model.Duration <= this.shortVideoDuration * 1000000000
           : false;
 
@@ -473,13 +477,13 @@ export default {
           html: `<div class="pswp__html"></div>`, // Replaced with the <video> element.
           model: model, // Content model.
           duration: model.Duration > 0 ? model.Duration / 1000000000 : 0,
-          format: this.$util.videoFormat(model?.Codec, model?.Mime), // Content format.
-          loop: model?.Type !== media.Live && (isShort || model?.Type === media.Animated), // If possible, loop these types.
+          format: this.$util.videoFormat(model.Codec || "", model.Mime || ""), // Content format.
+          loop: (model.Type !== media.Live) && (isShort || model.Type === media.Animated), // If possible, loop these types.
           msrc: thumb.src, // Image URL.
           loading: true,
         };
 
-        if (model?.Type === media.Live) {
+        if (model.Type === media.Live) {
           data.width = thumb.width;
           data.height = thumb.height;
         }
@@ -487,8 +491,7 @@ export default {
         return data;
       }
 
-      // Return the image data so that PhotoSwipe can render it in the lightbox,
-      // see https://photoswipe.com/data-sources/#dynamically-generated-data.
+      // Return the image data so that PhotoSwipe can render it in the lightbox
       return thumb;
     },
     isContentZoomable(isContentZoomable, content) {
@@ -538,6 +541,10 @@ export default {
     // Creates an HTMLMediaElement for playing videos, animations, and live photos.
     createVideoElement(data, autoplay = false, loop = false, mute = false) {
       const model = data.model;
+      if (!model) {
+        return document.createElement("video");
+      }
+
       const format = data.format;
       const posterSrc = data.msrc;
 
@@ -588,7 +595,7 @@ export default {
       // Create and append video source elements, depending on file format support.
       if (
         format !== media.FormatAvc &&
-        model?.Mime &&
+        model.Mime &&
         model.Mime !== media.ContentTypeMp4AvcMain &&
         video.canPlayType(model.Mime)
       ) {
@@ -623,7 +630,7 @@ export default {
 
       if (!video || !data) {
         return;
-      } else if (ev && ev.target.src !== video.src) {
+      } else if (ev && ev.target && ev.target.src !== video.src) {
         return;
       }
 
@@ -1716,13 +1723,18 @@ export default {
 
       let index = 0;
 
+      // Add null check for this.models
+      if (!this.models) {
+        return;
+      }
+
       // remove duplicates
-      let filtered = this.models?.filter(function (p, i, s) {
+      let filtered = this.models.filter(function (p, i, s) {
         return !(i > 0 && p.UID === s[i - 1].UID);
       });
 
       let selection = filtered.map((p, i) => {
-        if (this.model.UID === p.UID) {
+        if (this.model && this.model.UID === p.UID) {
           index = i;
         }
 
@@ -1856,13 +1868,24 @@ export default {
     },
     // Removes any touch and mouse event handlers.
     removeEventListeners() {
-      document.removeEventListener("touchstart", this.onTouchStartOnce.bind(this), { once: true });
-      document.removeEventListener("mousemove", this.onMouseMoveOnce.bind(this), { once: true });
+      // Store bound functions as instance properties to enable proper removal
+      if (!this._boundTouchStart) {
+        this._boundTouchStart = this.onTouchStartOnce.bind(this);
+      }
+      if (!this._boundMouseMove) {
+        this._boundMouseMove = this.onMouseMoveOnce.bind(this);
+      }
+
+      document.removeEventListener("touchstart", this._boundTouchStart);
+      document.removeEventListener("mousemove", this._boundMouseMove);
     },
     // Attaches touch and mouse event handlers to automatically hide controls.
     addEventListeners() {
-      document.addEventListener("touchstart", this.onTouchStartOnce.bind(this), { once: true });
-      document.addEventListener("mousemove", this.onMouseMoveOnce.bind(this), { once: true });
+      this._boundTouchStart = this.onTouchStartOnce.bind(this);
+      this._boundMouseMove = this.onMouseMoveOnce.bind(this);
+
+      document.addEventListener("touchstart", this._boundTouchStart, { once: true });
+      document.addEventListener("mousemove", this._boundMouseMove, { once: true });
     },
     startTimer() {
       if (this.hasTouch) {
