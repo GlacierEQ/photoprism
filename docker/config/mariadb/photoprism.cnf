@@ -1,0 +1,31 @@
+# MariaDB configuration optimized for PhotoPrism
+# Place this file in docker/config/mariadb/
+
+[mysqld]
+# Performance settings
+innodb_buffer_pool_size = 512M
+innodb_log_file_size = 128M
+innodb_file_per_table = 1
+innodb_flush_method = O_DIRECT
+innodb_flush_log_at_trx_commit = 0
+max_connections = 512
+innodb_lock_wait_timeout = 120
+transaction_isolation = READ-COMMITTED
+optimizer_search_depth = 4
+join_buffer_size = 8M
+sort_buffer_size = 8M
+tmp_table_size = 64M
+max_heap_table_size = 64M
+
+# Character set and collation
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# Security settings
+local-infile = 0
+
+# Cache settings
+table_open_cache = 2000
+table_definition_cache = 1400
+query_cache_size = 32M
+query_cache_type = 1

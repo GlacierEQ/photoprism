@@ -49,3 +49,27 @@ Thumbs.db
 .settings
 .swp
 .tmp
+
+# Version control
+.git
+.gitignore
+
+# Environment variables
+.env
+
+# Data directories
+data/
+
+# Kubernetes manifests
+kubernetes/
+
+# Documentation and misc files
+*.md
+LICENSE
+
+# Log files
+*.log
+
+# IDE files
+.vscode/
+.idea/

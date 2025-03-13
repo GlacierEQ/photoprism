@@ -1,0 +1,193 @@
+{
+  "version": "2.0.0",
+  "deployment": {
+    "team": {
+      "size": 12,
+      "recursion_depth": 4,
+      "build_mode": "parallel",
+      "allocation_strategy": "dynamic"
+    },
+    "resources": {
+      "cpu_allocation": "auto",
+      "memory_allocation": "auto",
+      "disk_min_required": "10G",
+      "network_required": true
+    },
+    "environment": {
+      "production": {
+        "default": true,
+        "validation_level": "strict",
+        "health_check_timeout": 300,
+        "auto_rollback": true
+      },
+      "staging": {
+        "validation_level": "normal",
+        "health_check_timeout": 180,
+        "auto_rollback": true
+      },
+      "development": {
+        "validation_level": "minimal",
+        "health_check_timeout": 60,
+        "auto_rollback": false
+      }
+    },
+    "docker": {
+      "compose_file": "docker-compose.yml",
+      "use_buildkit": true,
+      "platform": "auto",
+      "registry": {
+        "url": "docker.io",
+        "username": "${DOCKER_USERNAME}",
+        "password": "${DOCKER_PASSWORD}"
+      }
+    },
+    "monitoring": {
+      "enabled": true,
+      "metrics_collection_interval": 15,
+      "log_rotation": {
+        "max_size": "100M",
+        "max_files": 10
+      },
+      "alerts": [
+        {
+          "name": "high_cpu_usage",
+          "threshold": 90,
+          "duration": "5m",
+          "severity": "warning"
+        },
+        {
+          "name": "high_memory_usage",
+          "threshold": 85,
+          "duration": "5m",
+          "severity": "warning"
+        },
+        {
+          "name": "disk_space_low",
+          "threshold": 90,
+          "duration": "10m",
+          "severity": "critical"
+        }
+      ]
+    },
+    "security": {
+      "scan_docker_images": true,
+      "enforce_https": true,
+      "validate_dependencies": true,
+      "secrets_management": {
+        "provider": "env_file",
+        "rotation_period": "30d"
+      }
+    },
+    "notifications": {
+      "deployment_start": true,
+      "deployment_success": true,
+      "deployment_failure": true,
+      "channels": [
+        {
+          "type": "email",
+          "enabled": false,
+          "recipients": ["admin@example.com"]
+        },
+        {
+          "type": "slack",
+          "enabled": false,
+          "webhook_url": "${SLACK_WEBHOOK_URL}"
+        }
+      ]
+    },
+    "rollback": {
+      "automatic": true,
+      "threshold": 3,
+      "keep_versions": 5
+    }
+  },
+  "ninja_team": {
+    "members": [
+      {
+        "id": 1,
+        "role": "lead",
+        "capabilities": ["deployment", "monitoring", "testing"]
+      },
+      {
+        "id": 2,
+        "role": "network",
+        "capabilities": ["network", "security", "monitoring"]
+      },
+      {
+        "id": 3,
+        "role": "database",
+        "capabilities": ["database", "storage", "backup"]
+      },
+      {
+        "id": 4,
+        "role": "frontend",
+        "capabilities": ["frontend", "ui", "performance"]
+      },
+      {
+        "id": 5,
+        "role": "backend",
+        "capabilities": ["backend", "api", "performance"]
+      },
+      {
+        "id": 6,
+        "role": "security",
+        "capabilities": ["security", "audit", "compliance"]
+      },
+      {
+        "id": 7,
+        "role": "testing",
+        "capabilities": ["testing", "quality", "validation"]
+      },
+      {
+        "id": 8,
+        "role": "infrastructure",
+        "capabilities": ["infrastructure", "scaling", "orchestration"]
+      },
+      {
+        "id": 9,
+        "role": "optimization",
+        "capabilities": ["optimization", "performance", "benchmarking"]
+      },
+      {
+        "id": 10,
+        "role": "monitoring",
+        "capabilities": ["monitoring", "alerting", "logging"]
+      },
+      {
+        "id": 11,
+        "role": "backup",
+        "capabilities": ["backup", "recovery", "archiving"]
+      },
+      {
+        "id": 12,
+        "role": "deployment",
+        "capabilities": ["deployment", "release", "coordination"]
+      }
+    ],
+    "task_allocation": {
+      "strategy": "capability-based",
+      "load_balancing": true,
+      "fallback_member": 1
+    }
+  },
+  "build": {
+    "cmake": {
+      "enabled": true,
+      "build_type": "Release",
+      "ninja": true,
+      "parallel_jobs": "auto",
+      "cache": true
+    },
+    "go": {
+      "version": ">= 1.16",
+      "modules": true,
+      "build_tags": ["netgo", "osusergo"],
+      "ldflags": ["-s", "-w"]
+    },
+    "frontend": {
+      "node_version": ">= 16",
+      "npm_ci": true,
+      "production_mode": true
+    }
+  }
+}

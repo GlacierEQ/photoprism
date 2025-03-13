@@ -1,0 +1,34 @@
+# Ninja Team Configuration for PhotoPrism Deployment
+
+# Team configuration
+team:
+  size: 3  # Number of ninja workers
+  recursion_levels: 2  # Deployment recursion levels
+  build_mode: "parallel"  # parallel or sequential
+
+# Deployment settings
+deployment:
+  environment: "production"  # production, staging, development
+  strategy: "rolling"  # rolling, blue-green, canary
+  rollback_enabled: true
+  healthcheck_timeout: 120  # seconds
+
+# Resource limits
+resources:
+  memory: "8Gi"
+  cpu: "4"
+  storage: "50Gi"
+
+# Monitoring
+monitoring:
+  enabled: true
+  metrics_retention: "7d"
+  alert_channels:
+    - email
+    - slack
+
+# Security
+security:
+  scan_images: true
+  enforce_rbac: true
+  network_policies: true

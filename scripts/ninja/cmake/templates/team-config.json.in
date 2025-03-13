@@ -1,0 +1,117 @@
+{
+  "team": {
+    "name": "PhotoPrism Ninja Team",
+    "version": "2.0.0",
+    "size": @NINJA_TEAM_SIZE@,
+    "recursion_depth": @NINJA_RECURSION_DEPTH@,
+    "parallel_jobs": @NINJA_PARALLEL_JOBS@,
+    "build_mode": "@NINJA_BUILD_MODE@"
+  },
+  "resources": {
+    "memory_per_ninja": "@NINJA_MAX_MEMORY@",
+    "cpu_per_ninja": @NINJA_MAX_CPU@,
+    "max_disk_usage": "50G",
+    "network_bandwidth": "1Gbps"
+  },
+  "logging": {
+    "level": "@NINJA_LOG_LEVEL@",
+    "format": "json",
+    "output": ["file", "console"],
+    "max_file_size": "100M",
+    "rotation": {
+      "enabled": true,
+      "max_files": 10,
+      "compress": true
+    },
+    "metrics": {
+      "enabled": true,
+      "interval": "10s"
+    }
+  },
+  "monitoring": {
+    "enabled": @NINJA_MONITOR_ENABLED@,
+    "metrics_endpoint": "http://localhost:9090/metrics",
+    "dashboard_url": "http://localhost:3000",
+    "alert_thresholds": {
+      "cpu_usage": 90,
+      "memory_usage": 85,
+      "disk_usage": 90,
+      "error_rate": 5
+    },
+    "notification_channels": [
+      "console",
+      "slack",
+      "email"
+    ]
+  },
+  "optimization": {
+    "auto_scaling": true,
+    "cache_enabled": true,
+    "cache_size": "1G",
+    "compression_level": 9,
+    "parallel_optimization": true,
+    "task_prioritization": true
+  },
+  "benchmarking": {
+    "enabled": @NINJA_BENCHMARK_ENABLED@,
+    "baseline_comparison": true,
+    "metrics": [
+      "execution_time",
+      "memory_usage",
+      "cpu_usage",
+      "disk_io",
+      "network_io"
+    ],
+    "output_format": ["json", "html"],
+    "history_retention": "30d"
+  },
+  "security": {
+    "encryption": {
+      "enabled": true,
+      "algorithm": "AES-256",
+      "key_rotation": "30d"
+    },
+    "access_control": {
+      "enabled": true,
+      "authentication_required": true,
+      "role_based": true,
+      "roles": ["admin", "developer", "viewer"]
+    },
+    "network_policies": {
+      "enabled": true,
+      "ingress_whitelist": ["127.0.0.1", "10.0.0.0/8"],
+      "egress_whitelist": ["*"]
+    }
+  },
+  "deployment": {
+    "strategies": ["blue-green", "canary", "rolling"],
+    "default_strategy": "rolling",
+    "auto_rollback": true,
+    "health_check": {
+      "enabled": true,
+      "interval": "10s",
+      "timeout": "5s",
+      "retries": 3,
+      "success_threshold": 1,
+      "failure_threshold": 3
+    },
+    "environments": [
+      {
+        "name": "development",
+        "auto_deploy": true,
+        "protected": false
+      },
+      {
+        "name": "staging",
+        "auto_deploy": false,
+        "protected": true
+      },
+      {
+        "name": "production",
+        "auto_deploy": false,
+        "protected": true,
+        "approval_required": true
+      }
+    ]
+  }
+}

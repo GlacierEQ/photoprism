@@ -1,0 +1,147 @@
+{
+  "configurations": [
+    {
+        "type": "firefox",
+        "request": "launch",
+        "reAttach": true,
+        "name": "Launch index.html",
+        "file": "${workspaceFolder}/index.html"
+    },
+    {
+        "name": "Dart: Run all Tests",
+        "type": "dart",
+        "request": "launch",
+        "program": "./test/"
+    }docker tag your-app-name your-dockerhub-username/your-app-name
+docker push your-dockerhub-username/your-app-name
+docker run -p 8000:8000 your-app-name
+docker build -t your-app-name .
+# Use an official base image (e.g., Python, Node.js, etc.)
+FROM python:3.9-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the requirements file and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code
+COPY . .
+
+...
+"pvsStudio.cmakeProjectsAnalyzer.path": "C:/Program Files (x86)/PVS-Studio/PVS-Studio_Cmd.exe", // Adjust based on where PVS-Studio is installed
+...
+EXPOSE 8000
+
+# Command to run your application
+CMD ["python", "app.py"]
+
+    {
+        "name": "Debug",
+        "type": "powercpp",
+        "request": "launch"
+    },
+    "java.debug.settings.hotCodeReplace": "auto",
+    "java.saveActions.organizeImports": true,
+    "editor.foldingImportsByDefault": true
+
+    "java.debug.settings.hotCodeReplace": "auto",
+    "java.saveActions.organizeImports": true,
+    "editor.foldingImportsByDefault": true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    "java.debug.settings.hotCodeReplace": "auto",
+    "java.saveActions.organizeImports": true,
+    "editor.foldingImportsByDefault": true
+
+
+
+
+
+
+    "rest-client.defaultHeaders": {
+      "User-Agent": "vscode-restclient"
+    },
+    "rest-client.followredirect": false,
+    "rest-client.enableTelemetry": false,
+    "rest-client.previewResponsePanelTakeFocus": false,
+
+    "java.debug.settings.hotCodeReplace": "auto",
+    "java.saveActions.organizeImports": true,
+    "editor.foldingImportsByDefault": true
+{
+  "configurations": [
+    {
+      "name": "Dart: Run all Tests",
+      "type": "dart",
+      "request": "launch",
+      "program": "./test/"
+    },
+    {
+      "name": "Debug",
+      "type": "powercpp",
+      "request": "launch"
+    },
+    {
+      "type": "pwa-msedge",
+      "name": "Launch Microsoft Edge",
+      "request": "launch",
+      "runtimeArgs": ["--remote-debugging-port=9222"],
+      "url": "${env:PROJECT_URL}",
+      "presentation": {
+        "hidden": true
+      }
+    },
+    {
+      "type": "pwa-msedge",
+      "name": "Launch Microsoft Edge in headless mode",
+      "request": "launch",
+      "runtimeArgs": ["--headless", "--remote-debugging-port=9222"],
+      "url": "${env:PROJECT_URL}",
+      "presentation": {
+        "hidden": true
+      }
+    },
+    {
+      "type": "vscode-edge-devtools.debug",
+      "name": "Open Edge DevTools",
+      "request": "attach",
+      "url": "${env:PROJECT_URL}",
+      "presentation": {
+        "hidden": true
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Launch Edge Headless and attach DevTools",
+      "configurations": [
+        "Launch Microsoft Edge in headless mode",
+        "Open Edge DevTools"
+      ]
+    },
+    {
+      "name": "Launch Edge and attach DevTools",
+      "configurations": ["Launch Microsoft Edge", "Open Edge DevTools"]
+    }
+  ]
+}

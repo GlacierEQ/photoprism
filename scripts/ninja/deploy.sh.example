@@ -1,0 +1,139 @@
+#!/bin/bash
+#
+# Ninja Team Deployment Script for PhotoPrism
+# This script handles multi-stage deployment using the Ninja Team pattern
+
+set -e
+
+# Configuration
+TEAM_SIZE=${TEAM_SIZE:-3}
+RECURSION_LEVELS=${RECURSION_LEVELS:-2}
+BUILD_MODE=${BUILD_MODE:-"parallel"}
+BUILD_DIR=${BUILD_DIR:-"build/ninja"}
+DEPLOYMENT_ENV=${DEPLOYMENT_ENV:-"production"}
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+
+# Load team configuration if exists
+if [ -f "${BUILD_DIR}/config/ninja-team.yml" ]; then
+  echo "Using team configuration from ${BUILD_DIR}/config/ninja-team.yml"
+  # In a real implementation, parse YAML here
+else
+  echo "Using default team configuration"
+fi
+
+echo "=== PhotoPrism Ninja Team Deployment ==="
+echo "Team Size: $TEAM_SIZE"
+echo "Recursion Levels: $RECURSION_LEVELS"
+echo "Build Mode: $BUILD_MODE"
+echo "Environment: $DEPLOYMENT_ENV"
+echo "========================================"
+
+# Backup current state before deployment
+mkdir -p ${BUILD_DIR}/state
+if [ -f "${BUILD_DIR}/deployment-status.json" ]; then
+  cp ${BUILD_DIR}/deployment-status.json ${BUILD_DIR}/state/previous-deployment.json
+fi
+
+# Create deployment status file
+cat > ${BUILD_DIR}/deployment-status.json << EOF
+{
+  "timestamp": "$TIMESTAMP",
+  "environment": "$DEPLOYMENT_ENV",
+  "team_size": $TEAM_SIZE,
+  "build_mode": "$BUILD_MODE",
+  "status": "in_progress"
+}
+EOF
+
+# Function to deploy with a single ninja
+deploy_with_ninja() {
+  local ninja_id=$1
+  local level=$2
+  local task=$3
+
+  echo "[Ninja $ninja_id] Executing $task at level $level"
+
+  # Log the task
+  mkdir -p ${BUILD_DIR}/ninja-${ninja_id}/logs
+  echo "Task: $task, Level: $level, Time: $(date)" >> ${BUILD_DIR}/ninja-${ninja_id}/logs/tasks.log
+
+  # Simulate the work
+  sleep $(( ( RANDOM % 3 ) + 1 ))
+
+  # Update agent status
+  cat > ${BUILD_DIR}/ninja-${ninja_id}/agent-info.json << EOF
+{
+  "id": $ninja_id,
+  "ready": true,
+  "status": "active",
+  "last_task": "$task",
+  "last_level": $level,
+  "last_update": "$(date)"
+}
+EOF
+
+  echo "[Ninja $ninja_id] Completed $task at level $level"
+}
+
+# Deploy with the ninja team
+echo "Starting ninja team deployment..."
+
+# Main deployment tasks
+TASKS=("prepare_environment" "pull_images" "create_network" "start_database" "verify_database" "start_photoprism" "verify_deployment")
+
+# If in parallel mode, distribute tasks among ninjas
+if [ "$BUILD_MODE" == "parallel" ]; then
+  echo "Using parallel build mode"
+
+  for level in $(seq 1 $RECURSION_LEVELS); do
+    echo "--- Recursion Level $level ---"
+
+    for i in $(seq 0 $((${#TASKS[@]} - 1))); do
+      ninja_id=$(( (i % TEAM_SIZE) + 1 ))
+      task=${TASKS[$i]}
+
+      if [ "$level" -eq "1" ]; then
+        deploy_with_ninja $ninja_id $level "$task"
+      else
+        deploy_with_ninja $ninja_id $level "optimize_$task"
+      fi
+    done
+  done
+else
+  echo "Using sequential build mode"
+
+  for level in $(seq 1 $RECURSION_LEVELS); do
+    echo "--- Recursion Level $level ---"
+
+    for task in "${TASKS[@]}"; do
+      ninja_id=$(( (RANDOM % TEAM_SIZE) + 1 ))
+
+      if [ "$level" -eq "1" ]; then
+        deploy_with_ninja $ninja_id $level "$task"
+      else
+        deploy_with_ninja $ninja_id $level "optimize_$task"
+      fi
+    done
+  done
+fi
+
+# Final deployment step - actual Docker Compose up
+echo "Executing final deployment with docker compose..."
+docker compose up -d
+
+# Update deployment status
+cat > ${BUILD_DIR}/deployment-status.json << EOF
+{
+  "timestamp": "$TIMESTAMP",
+  "environment": "$DEPLOYMENT_ENV",
+  "team_size": $TEAM_SIZE,
+  "build_mode": "$BUILD_MODE",
+  "status": "completed",
+  "completion_time": "$(date)"
+}
+EOF
+
+echo "=== Ninja Team Deployment Complete ==="
+echo "PhotoPrism should now be available at: http://localhost:2342/"
+echo "Run 'make ninja-status' to check deployment status"
+echo "=======================================

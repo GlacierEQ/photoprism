@@ -1017,3 +1017,69 @@ team-test:
 
 # Include custom targets
 include scripts/ninja/custom.mk
+
+.PHONY: up down restart logs backup clean
+
+up:
+	mkdir -p data/storage data/originals data/import data/mysql data/brains-models
+	docker compose up -d
+
+down:
+	docker compose down
+
+restart:
+	docker compose restart
+
+logs:
+	docker compose logs -f
+
+backup:
+	@echo "Creating database backup..."
+	@mkdir -p backups
+	@docker compose exec mariadb sh -c 'mysqldump -u root -p"$$MYSQL_ROOT_PASSWORD" photoprism' > backups/photoprism-db-$$(date +%Y%m%d-%H%M%S).sql
+	@echo "Backup created in backups/ folder"
+
+clean:
+	docker compose down -v
+	rm -rf data/mysql
+	mkdir -p data/mysql
+
+# PhotoPrism Ninja Team Deployment
+# -------------------------------
+
+# Default Ninja team configuration
+NINJA_TEAM_SIZE ?= 3
+NINJA_RECURSION_LEVELS ?= 2
+NINJA_BUILD_MODE ?= "parallel"
+BUILD_DIR ?= build/ninja
+DEPLOYMENT_ENV ?= production
+
+# Include custom ninja targets
+-include scripts/ninja/custom.mk
+
+# Main ninja team targets
+.PHONY: ninja ninja-team ninja-setup-all
+
+ninja: ninja-team
+ninja-team:
+	@echo "PhotoPrism Ninja Team Deployment"
+	@echo "Available commands:"
+	@echo "  make ninja-setup     - Set up the ninja team environment"
+	@echo "  make ninja-init      - Initialize the ninja team"
+	@echo "  make ninja-deploy    - Deploy using the ninja team"
+	@echo "  make ninja-status    - Check ninja team status"
+	@echo "  make ninja-clean     - Clean up ninja team artifacts"
+	@echo "  make ninja-rollback  - Roll back to previous deployment"
+	@echo ""
+	@echo "Configuration options:"
+	@echo "  NINJA_TEAM_SIZE = $(NINJA_TEAM_SIZE)"
+	@echo "  NINJA_RECURSION_LEVELS = $(NINJA_RECURSION_LEVELS)"
+	@echo "  NINJA_BUILD_MODE = $(NINJA_BUILD_MODE)"
+
+ninja-setup-all: ninja-setup
+	@mkdir -p scripts/ninja
+	@[ -f scripts/ninja/ninja-team.yml.example ] || cp scripts/ninja/ninja-team.yml.example.default scripts/ninja/ninja-team.yml.example
+	@[ -f scripts/ninja/deploy.sh.example ] || cp scripts/ninja/deploy.sh.example.default scripts/ninja/deploy.sh.example
+	@[ -f scripts/ninja/rollback.sh ] || cp scripts/ninja/rollback.sh.default scripts/ninja/rollback.sh
+	@chmod +x scripts/ninja/rollback.sh
+	@echo "Ninja team setup completed"
