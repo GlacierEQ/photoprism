@@ -1,5 +1,5 @@
 # PhotoPrism2 Dockerfile
-# Multi-stage build for optimized production container
+# Multi-stage build for optimized production container with enhanced terminal support
 
 # Build arguments
 ARG NODE_VERSION=16
@@ -79,7 +79,7 @@ LABEL org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.authors="PhotoPrism2 Team <team@photoprism2.org>" \
       org.opencontainers.image.licenses="MIT"
 
-# Install runtime dependencies with security patches
+# Install runtime dependencies with enhanced terminal support
 RUN apk --no-cache add \
     ca-certificates \
     tzdata \
@@ -89,10 +89,35 @@ RUN apk --no-cache add \
     curl \
     bash \
     tini \
+    ncurses \
+    shadow \
+    util-linux \
+    less \
+    nano \
+    vim \
+    bash-completion \
     && rm -rf /var/cache/apk/*
 
-# Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Configure terminal environment
+RUN echo "export PS1='\[\033[1;36m\]photoprism2\[\033[0m\]:\[\033[1;34m\]\w\[\033[0m\]$ '" >> /etc/profile.d/terminal.sh && \
+    echo "export TERM=xterm-256color" >> /etc/profile.d/terminal.sh && \
+    echo "export EDITOR=nano" >> /etc/profile.d/terminal.sh && \
+    echo "alias ls='ls --color=auto'" >> /etc/profile.d/terminal.sh && \
+    echo "alias ll='ls -la'" >> /etc/profile.d/terminal.sh && \
+    echo "alias l='ls -l'" >> /etc/profile.d/terminal.sh && \
+    chmod +x /etc/profile.d/terminal.sh
+
+# Create non-root user with proper terminal settings
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup -s /bin/bash && \
+    mkdir -p /home/appuser && \
+    chown -R appuser:appgroup /home/appuser
+
+# Copy bashrc for better terminal experience
+RUN echo 'source /etc/profile.d/terminal.sh' > /home/appuser/.bashrc && \
+    echo 'if [ -f /etc/bash_completion ]; then . /etc/bash_completion; fi' >> /home/appuser/.bashrc && \
+    echo 'export PATH=$PATH:/app' >> /home/appuser/.bashrc && \
+    chown appuser:appgroup /home/appuser/.bashrc
 
 # Set working directory
 WORKDIR /app
@@ -114,13 +139,20 @@ RUN mkdir -p /app/storage/photos /app/storage/thumbnails /app/storage/temp /app/
 # Switch to non-root user
 USER appuser
 
-# Environment variables
+# Environment variables for terminal
 ENV NODE_ENV=production \
     PORT=8000 \
     CONFIG_PATH=/app/config \
     STORAGE_PATH=/app/storage \
     LOG_LEVEL=info \
-    TZ=UTC
+    TZ=UTC \
+    TERM=xterm-256color \
+    COLORTERM=truecolor \
+    HISTCONTROL=ignoreboth \
+    HISTSIZE=1000 \
+    HISTFILESIZE=2000 \
+    LANG=en_US.UTF-8 \
+    SHELL=/bin/bash
 
 # Expose port
 EXPOSE 8000

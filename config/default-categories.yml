@@ -1,0 +1,113 @@
+# Default hierarchical categories for PhotoPrism2
+# This structure will be created on initial setup
+
+version: 1.0
+categories:
+  # Top-level categories
+  - name: People
+    slug: people
+    icon: user-group
+    color: "#4285F4"
+    description: Photos of people organized by individuals and groups
+
+  - name: Places
+    slug: places
+    icon: map-pin
+    color: "#34A853"
+    description: Photos organized by location
+
+  - name: Events
+    slug: events
+    icon: calendar
+    color: "#FBBC05"
+    description: Photos organized by events and dates
+
+  - name: Objects
+    slug: objects
+    icon: cube
+    color: "#EA4335"
+    description: Photos of objects and things
+
+  - name: Documents
+    slug: documents
+    icon: document-text
+    color: "#9C27B0"
+    description: Scanned documents and papers
+
+  # Legal case structure (example implementation for court cases)
+  - name: Legal Cases
+    slug: legal-cases
+    icon: scale-balanced
+    color: "#795548"
+    description: Materials related to legal proceedings
+    children:
+      - name: Family Court Case
+        slug: family-court-case
+        icon: gavel
+        color: "#007BFF"
+        description: Family court proceedings and documentation
+        children:
+          - name: Custody and Visitation
+            slug: custody-and-visitation
+            children:
+              - name: Motions
+                slug: motions
+                children:
+                  - name: Pending
+                    slug: pending
+                  - name: Approved
+                    slug: approved
+                  - name: Denied
+                    slug: denied
+                  - name: Templates
+                    slug: templates
+              - name: Mediation
+                slug: mediation
+                children:
+                  - name: Communications
+                    slug: communications
+                  - name: Reports
+                    slug: reports
+              - name: Visitation Records
+                slug: visitation-records
+              - name: Evidence
+                slug: evidence
+              - name: Medical Concerns
+                slug: medical-concerns
+              - name: Child Support
+                slug: child-support
+          - name: Restraining Orders
+            slug: restraining-orders
+            children:
+              - name: Active Orders
+                slug: active-orders
+              - name: Expired Orders
+                slug: expired-orders
+          - name: Judicial Accountability
+            slug: judicial-accountability
+
+      - name: Employment Cases
+        slug: employment-cases
+        icon: briefcase
+        color: "#28A745"
+        description: Employment and labor disputes
+
+      - name: Administrative Hearings
+        slug: administrative-hearings
+        icon: building
+        color: "#FFC107"
+        description: Administrative proceedings and hearings
+
+  # Custom category for AI integration
+  - name: AI Projects
+    slug: ai-projects
+    icon: microchip
+    color: "#6610F2"
+    description: AI-related projects and materials
+    children:
+      - name: Motion Drafting
+        slug: motion-drafting
+      - name: Templates
+        slug: ai-templates
+      - name: Research
+        slug: ai-research

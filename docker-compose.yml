@@ -61,6 +61,8 @@ services:
       PHOTOPRISM_DETECT_NSFW: "${PHOTOPRISM_DETECT_NSFW:-false}"
       PHOTOPRISM_UPLOAD_NSFW: "${PHOTOPRISM_UPLOAD_NSFW:-true}"
       PHOTOPRISM_PUBLIC: "${PHOTOPRISM_PUBLIC:-false}"
+      TERM: xterm-256color
+      COLORTERM: truecolor
     volumes:
       - "${PHOTOPRISM_DATA_PATH:-./data}/storage:/photoprism/storage"
       - "${PHOTOPRISM_DATA_PATH:-./data}/originals:/photoprism/originals"
@@ -87,6 +89,8 @@ services:
     secrets:
       - photoprism_admin_password
       - photoprism_db_password
+    tty: true
+    stdin_open: true
 
   mariadb:
     image: mariadb:10.11
@@ -128,6 +132,8 @@ services:
     secrets:
       - mariadb_root_password
       - photoprism_db_password
+    tty: true
+    stdin_open: true
 
   app:
     build:
@@ -153,6 +159,9 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - JWT_SECRET=${JWT_SECRET}
       - SESSION_SECRET=${SESSION_SECRET}
+      - TERM=xterm-256color
+      - COLORTERM=truecolor
+      - PS1='\[\033[1;36m\]photoprism2\[\033[0m\]:\[\033[1;34m\]\w\[\033[0m\]$ '
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8000/api/v1/health"]
       <<: *default-healthcheck
@@ -164,6 +173,8 @@ services:
         limits:
           cpus: "${APP_CPU_LIMIT:-1}"
           memory: "${APP_MEMORY_LIMIT:-1G}"
+    tty: true
+    stdin_open: true
 
   postgres:
     image: postgres:14-alpine
@@ -174,6 +185,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
       - POSTGRES_DB=${DB_NAME:-photoprism}
       - PGDATA=/var/lib/postgresql/data/pgdata
+      - TERM=xterm-256color
     volumes:
       - "${PHOTOPRISM_DATA_PATH:-./data}/postgres:/var/lib/postgresql/data"
       - "./docker/config/postgres:/docker-entrypoint-initdb.d:ro"
@@ -190,6 +202,8 @@ services:
         limits:
           cpus: "${POSTGRES_CPU_LIMIT:-1}"
           memory: "${POSTGRES_MEMORY_LIMIT:-1G}"
+    tty: true
+    stdin_open: true
 
   # Optional Traefik reverse proxy for SSL/TLS support
   traefik:
@@ -197,20 +211,6 @@ services:
     container_name: photoprism-traefik
     profiles: ["with-traefik"]
     command:
-      - "--api.insecure=false"
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.file.directory=/etc/traefik/dynamic"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.email=${SSL_EMAIL:-}"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
-    networks:
       - photoprism_network
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
