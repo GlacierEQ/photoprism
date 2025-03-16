@@ -1,0 +1,166 @@
+# Default values for PhotoPrism2 Helm chart
+# This is a YAML-formatted file.
+
+# Application image settings
+image:
+  repository: photoprism/photoprism2
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Deployment configuration
+replicaCount: 1
+revisionHistoryLimit: 3
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
+# Pod resources
+resources:
+  limits:
+    cpu: 1
+    memory: 2Gi
+  requests:
+    cpu: 200m
+    memory: 512Mi
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8000
+  annotations: {}
+
+# Security context for running as non-root
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+  readOnlyRootFilesystem: true
+
+# Pod annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8000"
+  prometheus.io/path: "/metrics"
+
+# Pod security policy
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+
+# Autoscaling configuration
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: photoprism2.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Environment variables for application
+env:
+  # Core settings
+  NODE_ENV: "production"
+  CONFIG_PATH: "/app/config"
+  STORAGE_PATH: "/app/storage"
+  LOG_LEVEL: "info"
+
+  # PhotoPrism specific settings
+  PHOTOPRISM_ADMIN_USER: "admin"
+  # PHOTOPRISM_ADMIN_PASSWORD: "" # Set this via secret
+  PHOTOPRISM_AUTH: "true"
+  PHOTOPRISM_READONLY: "false"
+  PHOTOPRISM_PUBLIC: "false"
+
+  # Monitoring and metrics
+  METRICS_ENABLED: "true"
+  METRICS_PATH: "/metrics"
+
+# Secret environment variables (will be stored in a Kubernetes Secret)
+secretEnv:
+  - name: JWT_SECRET
+    key: jwt-secret
+  - name: SESSION_SECRET
+    key: session-secret
+  - name: PHOTOPRISM_ADMIN_PASSWORD
+    key: admin-password
+
+# Persistence configuration
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+  # existingClaim: ""
+
+# Init containers
+initContainers:
+  - name: init-permissions
+    image: busybox
+    command: ["sh", "-c", "chown -R 1000:1000 /app/storage"]
+    volumeMounts:
+      - name: storage
+        mountPath: /app/storage
+    securityContext:
+      runAsUser: 0
+
+# PostgreSQL database (dependency chart)
+postgresql:
+  enabled: true
+  auth:
+    username: photoprism
+    password: null # Must be provided during installation
+    database: photoprism
+  primary:
+    persistence:
+      size: 5Gi
+
+# Prometheus monitoring (dependency chart)
+prometheus:
+  enabled: false
+  alertmanager:
+    enabled: true
+  server:
+    persistentVolume:
+      size: 8Gi
+
+# Network policies
+networkPolicy:
+  enabled: false
+  ingressRules:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: nginx-ingress
+  egressRules:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  # maxUnavailable: 1
+
+# Tolerations and node affinity
+tolerations: []
+nodeSelector: {}
+affinity: {}

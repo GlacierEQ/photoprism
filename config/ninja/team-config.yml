@@ -1,0 +1,120 @@
+# Ninja Team Configuration for PhotoPrism2
+# =======================================
+
+team:
+  name: "PhotoPrism2 Ninja Team"
+  version: "1.0.0"
+  size: 4
+  recursion_depth: 2
+  build_mode: "parallel"
+
+resources:
+  memory_per_ninja: "1G"
+  cpu_per_ninja: 1
+  max_disk_usage: "20G"
+  network_bandwidth: "1Gbps"
+
+deployment:
+  environments:
+    - name: production
+      default: true
+      docker_compose_file: "docker-compose.yml"
+      requires_ssl: true
+    - name: development
+      docker_compose_file: "docker-compose.override.yml"
+      requires_ssl: false
+    - name: testing
+      docker_compose_file: "docker-compose.test.yml"
+      requires_ssl: false
+
+  tasks:
+    - name: prepare_environment
+      description: "Prepare the deployment environment"
+      requires:
+        - docker
+      timeout: 300
+      retry: 3
+
+    - name: build_docker_images
+      description: "Build or pull Docker images"
+      requires:
+        - docker
+      timeout: 900
+      retry: 2
+
+    - name: setup_network
+      description: "Configure Docker networking"
+      requires:
+        - docker
+      timeout: 120
+      retry: 3
+
+    - name: start_database
+      description: "Start and verify database services"
+      requires:
+        - docker
+        - setup_network
+      timeout: 300
+      retry: 5
+
+    - name: start_services
+      description: "Start all remaining services"
+      requires:
+        - docker
+        - start_database
+      timeout: 600
+      retry: 3
+
+    - name: verify_deployment
+      description: "Verify all services are running correctly"
+      requires:
+        - start_services
+      timeout: 300
+      retry: 3
+
+    - name: setup_monitoring
+      description: "Configure monitoring and alerting"
+      requires:
+        - verify_deployment
+      timeout: 300
+      retry: 2
+      optional: true
+
+monitoring:
+  metrics:
+    - name: cpu_usage
+      description: "CPU usage percentage"
+      threshold: 80
+      alert: true
+
+    - name: memory_usage
+      description: "Memory usage percentage"
+      threshold: 85
+      alert: true
+
+    - name: disk_usage
+      description: "Disk usage percentage"
+      threshold: 90
+      alert: true
+
+  logging:
+    level: "info"
+    format: "json"
+    retention: "7d"
+
+  alerting:
+    channels:
+      - type: "console"
+        enabled: true
+      - type: "email"
+        enabled: false
+        recipients: ["admin@example.com"]
+      - type: "slack"
+        enabled: false
+        webhook: "https://hooks.slack.com/services/xxx/yyy/zzz"
+
+security:
+  scan_images: true
+  enforce_resource_limits: true
+  network_isolation: true
+  secrets_management: "file"

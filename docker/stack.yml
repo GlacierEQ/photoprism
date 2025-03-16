@@ -1,0 +1,288 @@
+version: '3.8'
+
+# Global environment settings
+x-environment: &default-environment
+  TZ: "${TZ:-UTC}"
+  LOG_LEVEL: "${LOG_LEVEL:-info}"
+  NODE_ENV: "${NODE_ENV:-production}"
+
+# Default logging configuration
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "${LOG_MAX_SIZE:-10m}"
+    max-file: "${LOG_MAX_FILES:-3}"
+    compress: "true"
+    labels: "com.photoprism.service"
+
+services:
+  app:
+    image: ${REGISTRY_URL:-localhost}/photoprism2:${IMAGE_TAG:-latest}
+    deploy:
+      mode: replicated
+      replicas: ${APP_REPLICAS:-2}
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+      restart_policy:
+        condition: any
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '${APP_CPU_LIMIT:-1}'
+          memory: ${APP_MEMORY_LIMIT:-1G}
+        reservations:
+          cpus: '${APP_CPU_RESERVE:-0.25}'
+          memory: ${APP_MEMORY_RESERVE:-256M}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.app.rule=Host(`${DOMAIN:-photoprism2.local}`)"
+        - "traefik.http.services.app.loadbalancer.server.port=8000"
+        - "traefik.http.routers.app.entrypoints=websecure"
+        - "traefik.http.routers.app.tls=true"
+        - "traefik.http.routers.app.tls.certresolver=letsencrypt"
+        - "com.photoprism.description=PhotoPrism2 Application"
+    environment:
+      <<: *default-environment
+      DATABASE_URL: postgres://${DB_USER:-photoprism}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-photoprism}
+      STORAGE_PATH: /app/storage
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+    configs:
+      - source: app_config
+        target: /app/config/config.yml
+    secrets:
+      - source: jwt_secret
+        target: /app/secrets/jwt_secret
+      - source: session_secret
+        target: /app/secrets/session_secret
+    volumes:
+      - app_storage:/app/storage
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging: *default-logging
+
+  postgres:
+    image: postgres:14-alpine
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role==manager"  # Keep DB on manager node for data persistence
+      restart_policy:
+        condition: any
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '${PG_CPU_LIMIT:-1}'
+          memory: ${PG_MEMORY_LIMIT:-1G}
+        reservations:
+          cpus: '${PG_CPU_RESERVE:-0.25}'
+          memory: ${PG_MEMORY_RESERVE:-512M}
+      labels:
+        - "com.photoprism.description=PhotoPrism2 Database"
+    environment:
+      POSTGRES_USER: ${DB_USER:-photoprism}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: ${DB_NAME:-photoprism}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    secrets:
+      - source: db_password
+        target: /run/secrets/db_password
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    configs:
+      - source: postgres_config
+        target: /etc/postgresql/postgresql.conf
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-photoprism}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging: *default-logging
+
+  traefik:
+    image: traefik:v2.10
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.role==manager"
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          cpus: '${TRAEFIK_CPU_LIMIT:-0.5}'
+          memory: ${TRAEFIK_MEMORY_LIMIT:-256M}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN:-photoprism2.local}`)"
+        - "traefik.http.routers.dashboard.service=api@internal"
+        - "traefik.http.routers.dashboard.entrypoints=websecure"
+        - "traefik.http.routers.dashboard.tls=true"
+        - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.dashboard.middlewares=auth"
+        - "traefik.http.middlewares.auth.basicauth.usersfile=/etc/traefik/auth/users.htpasswd"
+    ports:
+      - target: 80
+        published: ${HTTP_PORT:-80}
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: ${HTTPS_PORT:-443}
+        protocol: tcp
+        mode: host
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-admin@example.com}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--accesslog=true"
+      - "--log.level=${TRAEFIK_LOG_LEVEL:-INFO}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_data:/letsencrypt
+    configs:
+      - source: traefik_config
+        target: /etc/traefik/dynamic/config.yml
+      - source: traefik_auth
+        target: /etc/traefik/auth/users.htpasswd
+    networks:
+      - app_network
+    logging: *default-logging
+
+  prometheus:
+    image: prom/prometheus
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role==manager"
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          cpus: '${PROMETHEUS_CPU_LIMIT:-0.5}'
+          memory: ${PROMETHEUS_MEMORY_LIMIT:-512M}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.prometheus.rule=Host(`metrics.${DOMAIN:-photoprism2.local}`)"
+        - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+        - "traefik.http.routers.prometheus.entrypoints=websecure"
+        - "traefik.http.routers.prometheus.tls=true"
+        - "traefik.http.routers.prometheus.middlewares=auth"
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=${METRICS_RETENTION:-15d}"
+      - "--web.enable-lifecycle"
+    networks:
+      - app_network
+    logging: *default-logging
+
+  grafana:
+    image: grafana/grafana
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role==manager"
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          cpus: '${GRAFANA_CPU_LIMIT:-0.5}'
+          memory: ${GRAFANA_MEMORY_LIMIT:-512M}
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.grafana.rule=Host(`dashboard.${DOMAIN:-photoprism2.local}`)"
+        - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+        - "traefik.http.routers.grafana.entrypoints=websecure"
+        - "traefik.http.routers.grafana.tls=true"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
+    configs:
+      - source: grafana_config
+        target: /etc/grafana/provisioning
+    secrets:
+      - source: grafana_password
+        target: /run/secrets/grafana_password
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - app_network
+    logging: *default-logging
+
+volumes:
+  app_storage:
+    driver: local
+  pg_data:
+    driver: local
+  traefik_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  app_network:
+    driver: overlay
+    attachable: true
+    driver_opts:
+      encrypted: "true"
+
+configs:
+  app_config:
+    file: ./config/app.yml
+  postgres_config:
+    file: ./config/postgres/postgresql.conf
+  traefik_config:
+    file: ./config/traefik/config.yml
+  traefik_auth:
+    file: ./config/traefik/users.htpasswd
+  prometheus_config:
+    file: ./config/prometheus/prometheus.yml
+  grafana_config:
+    file: ./config/grafana
+
+secrets:
+  jwt_secret:
+    external: true
+  session_secret:
+    external: true
+  db_password:
+    external: true
+  grafana_password:
+    external: true

@@ -1,5 +1,5 @@
-# PhotoPrism2 Dockerfile
-# Multi-stage build for optimized production container
+# PhotoPrism2 Production Dockerfile
+# Optimized for security, performance, and minimal size
 
 # Build arguments
 ARG NODE_VERSION=16
@@ -29,7 +29,7 @@ RUN npm ci --no-audit --no-fund --loglevel error
 
 # Copy and build frontend code
 COPY frontend/ ./
-RUN npm run build && npm prune --production
+RUN npm run build:production && npm prune --production
 
 # Build stage for backend
 FROM golang:${GO_VERSION}-alpine AS backend-builder
@@ -61,6 +61,17 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -trimpath -ldflags="-s -w -X main.Version=${VERSION} -X main.BuildDate=${BUILD_DATE}" \
     -o photoprism2 ./cmd/photoprism2
 
+# Security scan stage
+FROM aquasec/trivy:latest AS security-scan
+WORKDIR /scan
+
+# Copy artifacts for scanning
+COPY --from=backend-builder /app/photoprism2 .
+COPY --from=frontend-builder /app/dist ./dist
+
+# Run security scan
+RUN trivy filesystem --exit-code 0 --no-progress --severity HIGH,CRITICAL /scan
+
 # Final minimal stage
 FROM alpine:${ALPINE_VERSION} AS final
 
@@ -69,15 +80,14 @@ ARG BUILD_DATE
 ARG VERSION
 ARG VCS_REF
 
-LABEL org.opencontainers.image.created=${BUILD_DATE} \
-      org.opencontainers.image.title="PhotoPrism2" \
-      org.opencontainers.image.description="PhotoPrism2 Application" \
-      org.opencontainers.image.source="https://github.com/photoprism/photoprism2" \
-      org.opencontainers.image.revision=${VCS_REF} \
-      org.opencontainers.image.version=${VERSION} \
-      org.opencontainers.image.vendor="PhotoPrism" \
-      org.opencontainers.image.authors="PhotoPrism2 Team <team@photoprism2.org>" \
-      org.opencontainers.image.licenses="MIT"
+LABEL org.label-schema.build-date=${BUILD_DATE} \
+      org.label-schema.name="PhotoPrism2" \
+      org.label-schema.description="PhotoPrism2 Application" \
+      org.label-schema.vcs-ref=${VCS_REF} \
+      org.label-schema.vcs-url="https://github.com/photoprism/photoprism2" \
+      org.label-schema.version=${VERSION} \
+      org.label-schema.schema-version="1.0" \
+      maintainer="PhotoPrism2 Team <team@photoprism2.org>"
 
 # Install runtime dependencies with security patches
 RUN apk --no-cache add \
@@ -109,7 +119,7 @@ RUN chmod +x /app/docker-entrypoint.sh /app/healthcheck.sh
 
 # Create necessary directories and set permissions
 RUN mkdir -p /app/storage/photos /app/storage/thumbnails /app/storage/temp /app/storage/logs \
-    && chown -R appuser:appgroup /app/storage
+    && chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser

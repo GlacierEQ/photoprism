@@ -53,6 +53,47 @@ Thumbs.db
 # Version control
 .git
 .gitignore
+.github
+
+# Node.js
+frontend/node_modules
+frontend/npm-debug.log
+frontend/coverage
+frontend/.env
+
+# Go
+backend/tmp
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Development and testing
+**/*.test.js
+**/*_test.go
+**/.env.local
+**/.env.development
+
+# Storage and cache files
+storage/*
+**/dist
+
+# Documentation and configuration
+README.md
+CHANGELOG.md
+docs/
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Logs
+logs
+*.log
 
 # Environment variables
 .env
@@ -66,10 +107,3 @@ kubernetes/
 # Documentation and misc files
 *.md
 LICENSE
-
-# Log files
-*.log
-
-# IDE files
-.vscode/
-.idea/

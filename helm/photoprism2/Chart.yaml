@@ -1,0 +1,32 @@
+apiVersion: v2
+name: photoprism2
+description: A Helm chart for PhotoPrism2 on Kubernetes
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://photoprism2.org
+sources:
+  - https://github.com/photoprism/photoprism2
+maintainers:
+  - name: PhotoPrism2 Team
+    email: team@photoprism2.org
+    url: https://photoprism2.org
+keywords:
+  - photos
+  - ai
+  - machine-learning
+  - gallery
+  - image-management
+annotations:
+  artifacthub.io/license: AGPL-3.0
+  artifacthub.io/prerelease: "true"
+  artifacthub.io/containsSecurityUpdates: "false"
+dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+  - name: prometheus
+    version: "15.x.x"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: prometheus.enabled

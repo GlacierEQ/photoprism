@@ -29,8 +29,8 @@ x-resources: &default-resources
 x-logging: &default-logging
   driver: "json-file"
   options:
-    max-size: "10m"
-    max-file: "3"
+    max-size: "${LOG_MAX_SIZE:-10m}"
+    max-file: "${LOG_MAX_FILES:-3}"
     compress: "true"
 
 services:
@@ -62,10 +62,10 @@ services:
       PHOTOPRISM_UPLOAD_NSFW: "${PHOTOPRISM_UPLOAD_NSFW:-true}"
       PHOTOPRISM_PUBLIC: "${PHOTOPRISM_PUBLIC:-false}"
     volumes:
-      - "./data/storage:/photoprism/storage"
-      - "./data/originals:/photoprism/originals"
-      - "./data/import:/photoprism/import"
-      - "./data/brains-models:/photoprism/assets/brains"
+      - "${PHOTOPRISM_DATA_PATH:-./data}/storage:/photoprism/storage"
+      - "${PHOTOPRISM_DATA_PATH:-./data}/originals:/photoprism/originals"
+      - "${PHOTOPRISM_DATA_PATH:-./data}/import:/photoprism/import"
+      - "${PHOTOPRISM_DATA_PATH:-./data}/brains-models:/photoprism/assets/brains"
     restart: unless-stopped
     user: "${PUID:-1000}:${PGID:-1000}"
     networks:
@@ -107,7 +107,7 @@ services:
       - --innodb-file-per-table=1
       - --innodb-flush-method=O_DIRECT
     volumes:
-      - "./data/mysql:/var/lib/mysql"
+      - "${PHOTOPRISM_DATA_PATH:-./data}/mysql:/var/lib/mysql"
       - "./docker/config/mariadb:/etc/mysql/conf.d:ro"
     restart: unless-stopped
     user: "${MYSQL_USER_ID:-999}:${MYSQL_GROUP_ID:-999}"
@@ -128,6 +128,68 @@ services:
     secrets:
       - mariadb_root_password
       - photoprism_db_password
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_VERSION: "${NODE_VERSION:-16}"
+        GO_VERSION: "${GO_VERSION:-1.19}"
+    container_name: photoprism2-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - "${PHOTOPRISM_DATA_PATH:-./data}/photoprism2-storage:/app/storage"
+      - "./config:/app/config:ro"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - DATABASE_URL=postgres://${DB_USER:-photoprism}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-photoprism}
+      - STORAGE_PATH=/app/storage
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - JWT_SECRET=${JWT_SECRET}
+      - SESSION_SECRET=${SESSION_SECRET}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8000/api/v1/health"]
+      <<: *default-healthcheck
+    logging: *default-logging
+    networks:
+      - photoprism_network
+    deploy:
+      resources:
+        limits:
+          cpus: "${APP_CPU_LIMIT:-1}"
+          memory: "${APP_MEMORY_LIMIT:-1G}"
+
+  postgres:
+    image: postgres:14-alpine
+    container_name: photoprism2-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${DB_USER:-photoprism}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+      - POSTGRES_DB=${DB_NAME:-photoprism}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - "${PHOTOPRISM_DATA_PATH:-./data}/postgres:/var/lib/postgresql/data"
+      - "./docker/config/postgres:/docker-entrypoint-initdb.d:ro"
+    networks:
+      - photoprism_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-photoprism}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "${POSTGRES_CPU_LIMIT:-1}"
+          memory: "${POSTGRES_MEMORY_LIMIT:-1G}"
 
   # Optional Traefik reverse proxy for SSL/TLS support
   traefik:
@@ -152,13 +214,14 @@ services:
       - photoprism_network
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./data/letsencrypt:/letsencrypt"
+      - "${PHOTOPRISM_DATA_PATH:-./data}/letsencrypt:/letsencrypt"
       - "./docker/traefik:/etc/traefik/dynamic:ro"
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: "256M"
+          cpus: "${TRAEFIK_CPU_LIMIT:-0.5}"
+          memory: "${TRAEFIK_MEMORY_LIMIT:-256M}"
+    logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN:-localhost}`)"
@@ -182,6 +245,11 @@ services:
       - photoprism_network
     restart: unless-stopped
     logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "${WATCHTOWER_CPU_LIMIT:-0.2}"
+          memory: "${WATCHTOWER_MEMORY_LIMIT:-128M}"
 
   # Optional Prometheus for metrics collection
   prometheus:
@@ -190,7 +258,7 @@ services:
     profiles: ["monitoring"]
     volumes:
       - "./docker/prometheus:/etc/prometheus"
-      - "./data/prometheus:/prometheus"
+      - "${PHOTOPRISM_DATA_PATH:-./data}/prometheus:/prometheus"
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -202,6 +270,11 @@ services:
       - photoprism_network
     restart: unless-stopped
     logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "${PROMETHEUS_CPU_LIMIT:-0.5}"
+          memory: "${PROMETHEUS_MEMORY_LIMIT:-512M}"
 
   # Optional Grafana for monitoring dashboards
   grafana:
@@ -212,7 +285,7 @@ services:
       - prometheus
     volumes:
       - "./docker/grafana/provisioning:/etc/grafana/provisioning"
-      - "./data/grafana:/var/lib/grafana"
+      - "${PHOTOPRISM_DATA_PATH:-./data}/grafana:/var/lib/grafana"
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
@@ -223,6 +296,36 @@ services:
       - photoprism_network
     restart: unless-stopped
     logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "${GRAFANA_CPU_LIMIT:-0.5}"
+          memory: "${GRAFANA_MEMORY_LIMIT:-512M}"
+
+  # Optional backup service
+  backup:
+    image: alpine:latest
+    container_name: photoprism-backup
+    profiles: ["with-backup"]
+    volumes:
+      - "${PHOTOPRISM_DATA_PATH:-./data}:/data:ro"
+      - "${BACKUP_PATH:-./backups}:/backups"
+      - "./docker/scripts/backup.sh:/backup.sh:ro"
+    environment:
+      - BACKUP_RETENTION_COUNT=${BACKUP_RETENTION_COUNT:-7}
+      - TZ=${TZ:-UTC}
+    entrypoint: ["/bin/sh", "/backup.sh"]
+    restart: unless-stopped
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "256M"
+
+volumes:
+  postgres-data:
+    driver: local
 
 networks:
   photoprism_network:

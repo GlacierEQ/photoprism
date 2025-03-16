@@ -7,8 +7,8 @@ CMAKE_BUILD_TYPE ?= Release
 CMAKE_GENERATOR ?= Ninja
 INSTALL_DIR ?= dist
 NINJA_JOBS ?= 0
-NINJA_TEAM_SIZE ?= 4
-NINJA_RECURSION_LEVELS ?= 3
+NINJA_TEAM_SIZE ?= 12
+NINJA_RECURSION_LEVELS ?= 7
 
 # Detect operating system
 ifeq ($(OS),Windows_NT)
@@ -22,7 +22,7 @@ else
     DETECTED_OS := $(shell uname -s)
     RM := rm -rf
     MKDIR := mkdir -p
-    EXE_SUFFIX := 
+    EXE_SUFFIX :=
     SEPARATOR := :
 endif
 
@@ -269,3 +269,144 @@ team-test:
 
 # Include custom targets
 include scripts/ninja/custom.mk
+
+# Ninja Team Makefile for PhotoPrism2
+# ==================================
+
+# Default variables
+NINJA_TEAM_SIZE ?= 4
+NINJA_RECURSION_DEPTH ?= 2
+NINJA_BUILD_MODE ?= parallel
+BUILD_DIR ?= build/ninja
+DEPLOYMENT_ENV ?= production
+
+# Help target
+.PHONY: help
+help:
+	@echo "PhotoPrism2 Ninja Team Deployment System"
+	@echo "========================================"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make -f Makefile.ninja <target>"
+	@echo ""
+	@echo "Targets:"
+	@echo "  ninja-deploy        - Deploy using ninja team"
+	@echo "  ninja-status        - Check deployment status"
+	@echo "  ninja-init          - Initialize ninja team"
+	@echo "  ninja-clean         - Clean up ninja artifacts"
+	@echo "  ninja-report        - Generate deployment report"
+	@echo "  ninja-rollback      - Rollback to previous deployment"
+	@echo ""
+	@echo "Configuration:"
+	@echo "  NINJA_TEAM_SIZE     = $(NINJA_TEAM_SIZE)"
+	@echo "  NINJA_RECURSION_DEPTH = $(NINJA_RECURSION_DEPTH)"
+	@echo "  NINJA_BUILD_MODE    = $(NINJA_BUILD_MODE)"
+	@echo "  DEPLOYMENT_ENV      = $(DEPLOYMENT_ENV)"
+	@echo ""
+
+# Deploy with ninja team
+.PHONY: ninja-deploy
+ninja-deploy:
+	@echo "Deploying with Ninja Team (size: $(NINJA_TEAM_SIZE), recursion: $(NINJA_RECURSION_DEPTH))"
+	@mkdir -p $(BUILD_DIR)/logs
+	@NINJA_TEAM_SIZE=$(NINJA_TEAM_SIZE) \
+	NINJA_RECURSION_DEPTH=$(NINJA_RECURSION_DEPTH) \
+	NINJA_BUILD_MODE=$(NINJA_BUILD_MODE) \
+	DEPLOYMENT_ENV=$(DEPLOYMENT_ENV) \
+	./scripts/ninja-deploy.sh 2>&1 | tee $(BUILD_DIR)/logs/deploy-$(shell date +%Y%m%d-%H%M%S).log
+
+# Check ninja team status
+.PHONY: ninja-status
+ninja-status:
+	@echo "Checking Ninja Team status..."
+	@if [ -f $(BUILD_DIR)/deployment-status.json ]; then \
+		cat $(BUILD_DIR)/deployment-status.json; \
+	else \
+		echo "No deployment status found."; \
+	fi
+	@echo ""
+	@echo "Team members:"
+	@for i in $$(seq 1 $(NINJA_TEAM_SIZE)); do \
+		if [ -f $(BUILD_DIR)/ninja-$$i/status.json ]; then \
+			echo "Ninja $$i:"; \
+			cat $(BUILD_DIR)/ninja-$$i/status.json; \
+			echo ""; \
+		else \
+			echo "Ninja $$i: Not initialized"; \
+			echo ""; \
+		fi; \
+	done
+
+# Initialize ninja team
+.PHONY: ninja-init
+ninja-init:
+	@echo "Initializing Ninja Team with $(NINJA_TEAM_SIZE) members..."
+	@mkdir -p config/ninja
+	@if [ ! -f config/ninja/team-config.yml ]; then \
+		cat > config/ninja/team-config.yml << EOF \
+team:\n\
+  name: "PhotoPrism2 Ninja Team"\n\
+  version: "1.0.0"\n\
+  size: $(NINJA_TEAM_SIZE)\n\
+  recursion_depth: $(NINJA_RECURSION_DEPTH)\n\
+  build_mode: "$(NINJA_BUILD_MODE)"\n\
+EOF \
+	fi
+	@mkdir -p $(BUILD_DIR)
+	@for i in $$(seq 1 $(NINJA_TEAM_SIZE)); do \
+		mkdir -p $(BUILD_DIR)/ninja-$$i/workspace; \
+		mkdir -p $(BUILD_DIR)/ninja-$$i/logs; \
+		echo "{\"id\": $$i, \"ready\": true, \"status\": \"initialized\"}" > $(BUILD_DIR)/ninja-$$i/status.json; \
+		echo "Initialized ninja $$i"; \
+	done
+	@echo "Ninja Team initialization complete."
+
+# Clean ninja artifacts
+.PHONY: ninja-clean
+ninja-clean:
+	@echo "Cleaning Ninja Team artifacts..."
+	@rm -rf $(BUILD_DIR)
+	@echo "Ninja Team cleanup complete."
+
+# Generate deployment report
+.PHONY: ninja-report
+ninja-report:
+	@echo "Generating Ninja Team deployment report..."
+	@if [ ! -d $(BUILD_DIR) ]; then \
+		echo "No deployment data found."; \
+		exit 1; \
+	fi
+	@mkdir -p $(BUILD_DIR)/reports
+	@REPORT_FILE="$(BUILD_DIR)/reports/report-$(shell date +%Y%m%d-%H%M%S).txt"; \
+	echo "PhotoPrism2 Ninja Team Deployment Report" > $$REPORT_FILE; \
+	echo "======================================" >> $$REPORT_FILE; \
+	echo "" >> $$REPORT_FILE; \
+	echo "Generated: $$(date)" >> $$REPORT_FILE; \
+	echo "" >> $$REPORT_FILE; \
+	if [ -f $(BUILD_DIR)/deployment-status.json ]; then \
+		echo "Deployment Status:" >> $$REPORT_FILE; \
+		cat $(BUILD_DIR)/deployment-status.json >> $$REPORT_FILE; \
+		echo "" >> $$REPORT_FILE; \
+	fi; \
+	echo "Docker Services:" >> $$REPORT_FILE; \
+	docker compose ps >> $$REPORT_FILE 2>/dev/null || echo "No running services" >> $$REPORT_FILE; \
+	echo "" >> $$REPORT_FILE; \
+	echo "Report generated at $$REPORT_FILE"
+
+# Rollback to previous deployment
+.PHONY: ninja-rollback
+ninja-rollback:
+	@echo "Rolling back to previous deployment..."
+	@if [ -d "$(BUILD_DIR)/backup-"* ]; then \
+		LATEST_BACKUP=$$(ls -d $(BUILD_DIR)/backup-* | sort -r | head -n1); \
+		if [ -f "$$LATEST_BACKUP/.env.backup" ]; then \
+			cp "$$LATEST_BACKUP/.env.backup" .env; \
+			echo "Restored environment configuration"; \
+		fi; \
+		echo "Rolling back services..."; \
+		docker compose down; \
+		docker compose up -d; \
+		echo "Rollback completed"; \
+	else \
+		echo "No backup found to rollback to."; \
+	fi

@@ -1,0 +1,87 @@
+# PhotoPrism2 Development Dockerfile
+# Optimized for developer workflow with hot reloading
+
+# Build arguments
+ARG NODE_VERSION=16
+ARG GO_VERSION=1.19
+ARG ALPINE_VERSION=3.17
+
+# Frontend development stage
+FROM node:${NODE_VERSION}-alpine
+LABEL maintainer="PhotoPrism2 Team <team@photoprism2.org>"
+LABEL environment="development"
+
+# Install system dependencies
+RUN apk --no-cache add \
+    ca-certificates \
+    tzdata \
+    exiftool \
+    ffmpeg \
+    netcat-openbsd \
+    curl \
+    bash \
+    git \
+    make \
+    gcc \
+    g++ \
+    python3 \
+    vim
+
+# Set working directory
+WORKDIR /app
+
+# Install Go
+RUN apk --no-cache add go~=${GO_VERSION}
+
+# Install debugging tools
+RUN go install github.com/go-delve/delve/cmd/dlv@latest && \
+    go install github.com/cweill/gotests/gotests@latest && \
+    go install github.com/fatih/gomodifytags@latest && \
+    go install golang.org/x/tools/gopls@latest
+
+# Create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Create directories
+RUN mkdir -p /app/frontend /app/backend /app/config /app/storage /app/logs \
+    && chown -R appuser:appgroup /app
+
+# Copy configuration files first (better caching)
+COPY --chown=appuser:appgroup config/ /app/config/
+
+# Copy entrypoint script
+COPY --chown=appuser:appgroup docker-entrypoint.sh /app/
+COPY --chown=appuser:appgroup docker/scripts/healthcheck.sh /app/healthcheck.sh
+RUN chmod +x /app/docker-entrypoint.sh /app/healthcheck.sh
+
+# Set permissions
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user for the remaining operations
+USER appuser
+
+# Set environment variables
+ENV NODE_ENV=development \
+    PORT=8000 \
+    CONFIG_PATH=/app/config \
+    STORAGE_PATH=/app/storage \
+    LOG_LEVEL=debug \
+    TZ=UTC \
+    GO111MODULE=on \
+    GOPATH=/app/.go \
+    PATH="/app/.go/bin:${PATH}" \
+    DEVELOPMENT=true \
+    HOT_RELOAD=true
+
+# Expose ports (dev server and debugging)
+EXPOSE 8000 8001 2345
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD /app/healthcheck.sh || exit 1
+
+# Volumes for development
+VOLUME ["/app/frontend", "/app/backend", "/app/storage"]
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["sh", "-c", "echo 'PhotoPrism2 Development Environment' && tail -f /dev/null"]
