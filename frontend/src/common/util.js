@@ -316,6 +316,8 @@ export default class $util {
     }
 
     switch (value) {
+      case "pdf":
+        return "PDF";
       case "jpg":
         return "JPEG";
       case media.FormatJpegXL:
@@ -391,8 +393,6 @@ export default class $util {
         return "Windows Media";
       case "svg":
         return "SVG";
-      case "pdf":
-        return "PDF";
       case "ai":
         return "Adobe Illustrator";
       case "ps":
@@ -422,8 +422,9 @@ export default class $util {
         return cameraMake + " " + cameraModel;
       }
     } else if (cameraID > 1 && cameraModel) {
-      // Return only the model if the camera make is unknown.
       return cameraModel;
+    } else if (cameraID > 1 && cameraMake) {
+      return cameraMake;
     }
 
     // Return a placeholder string for unknown cameras.

@@ -862,12 +862,18 @@ export class Photo extends RestModel {
       return;
     }
 
-    if (file.Width && file.Height) {
-      info.push(file.Width + " × " + file.Height);
-    } else if (!file.Primary) {
-      let primary = this.primaryFile();
-      if (primary && primary.Width && primary.Height) {
-        info.push(primary.Width + " × " + primary.Height);
+    if (file?.Pages > 0) {
+      info.push(file.Pages + " " + $gettext("Pages"));
+    }
+
+    if (file?.MediaType !== media.Document) {
+      if (file.Width && file.Height) {
+        info.push(file.Width + " × " + file.Height);
+      } else if (!file.Primary) {
+        let primary = this.primaryFile();
+        if (primary && primary.Width && primary.Height) {
+          info.push(primary.Width + " × " + primary.Height);
+        }
       }
     }
 
@@ -883,7 +889,9 @@ export class Photo extends RestModel {
       return this;
     }
 
-    return this.Files.find((f) => f.MediaType === media.Vector || f.FileType === media.FormatSVG);
+    return this.Files.find(
+      (f) => f.MediaType === media.Document || f.MediaType === media.Vector || f.FileType === media.FormatSVG
+    );
   }
 
   getVectorInfo = () => {
@@ -893,15 +901,15 @@ export class Photo extends RestModel {
 
   generateVectorInfo = memoizeOne((file) => {
     if (!file) {
-      return $gettext("Vector");
+      return $gettext("Unknown");
     }
 
     const info = [];
 
-    if (file.MediaType === media.Vector) {
+    if (file.MediaType === media.Vector || file.MediaType === media.Document) {
       info.push($util.fileType(file.FileType));
     } else {
-      info.push($gettext("Vector"));
+      info.push($gettext("Unknown"));
     }
 
     this.addSizeInfo(file, info);
@@ -965,24 +973,45 @@ export class Photo extends RestModel {
 
   // Example: Apple iPhone 12 Pro Max, DNG, 4032 × 3024, 32.9 MB
   getCameraInfo = () => {
-    let file = this.originalFile() || this.videoFile();
-    return this.generateCameraInfo(this.Camera, this.CameraID, this.CameraMake, this.CameraModel, file);
+    return this.generateCameraInfo(
+      this.Camera,
+      this.CameraID,
+      this.CameraMake,
+      this.CameraModel,
+      this.Iso,
+      this.Exposure
+    );
   };
 
-  generateCameraInfo = memoizeOne((camera, cameraId, cameraMake, cameraModel, file) => {
+  generateCameraInfo = memoizeOne((camera, cameraId, cameraMake, cameraModel, iso, exposure) => {
     let info = [];
 
     // Return only the complete camera name if the original is or contains a video.
-    if (file.Video) {
-      return $util.formatCamera(camera, cameraId, cameraMake, cameraModel, true);
+    info.push($util.formatCamera(camera, cameraId, cameraMake, cameraModel, true));
+
+    if (iso) {
+      info.push("ISO " + iso);
     }
 
-    // Get short camera names to leave room for additional details.
-    const cameraInfo = $util.formatCamera(camera, cameraId, cameraMake, cameraModel, false);
-
-    if (cameraInfo) {
-      info.push(cameraInfo);
+    if (exposure) {
+      info.push(exposure);
     }
+
+    if (!info.length) {
+      return $gettext("Unknown");
+    }
+
+    return info.join(", ");
+  });
+
+  // Example: DNG, 4032 × 3024, 32.9 MB
+  getImageInfo = () => {
+    let file = this.originalFile() || this.videoFile();
+    return this.generateImageInfo(file);
+  };
+
+  generateImageInfo = memoizeOne((file) => {
+    let info = [];
 
     if (file && file.Width && file.Codec) {
       info.push($util.formatCodec(file.Codec));
@@ -1006,53 +1035,41 @@ export class Photo extends RestModel {
       this.LensModel,
       this.CameraModel,
       this.FNumber,
-      this.Iso,
-      this.Exposure,
       this.FocalLength
     );
   };
 
-  generateLensInfo = memoizeOne(
-    (lens, lensId, lensMake, lensModel, cameraModel, fNumber, iso, exposure, focalLength) => {
-      let info = [];
-      const id = lensId ? lensId : lens && lens.ID ? lens.ID : 1;
-      const make = lensMake ? lensMake : lens && lens.Make ? lens.Make : "";
-      const model = (lensModel ? lensModel : lens && lens.Model ? lens.Model : "").replace("f/", "ƒ/");
+  generateLensInfo = memoizeOne((lens, lensId, lensMake, lensModel, cameraModel, fNumber, focalLength) => {
+    let info = [];
+    const id = lensId ? lensId : lens && lens.ID ? lens.ID : 1;
+    const make = lensMake ? lensMake : lens && lens.Make ? lens.Make : "";
+    const model = (lensModel ? lensModel : lens && lens.Model ? lens.Model : "").replace("f/", "ƒ/");
 
-      // Example: EF-S18-55mm f/3.5-5.6 IS STM
-      if (id > 1) {
-        if (!model && !!make) {
-          info.push(make);
-        } else if (model.length > 45) {
-          return model;
-        } else if (model) {
-          info.push(model);
-        }
+    // Example: EF-S18-55mm f/3.5-5.6 IS STM
+    if (id > 1) {
+      if (!model && !!make) {
+        info.push(make);
+      } else if (model.length > 45) {
+        return model;
+      } else if (model) {
+        info.push(model);
       }
-
-      if (focalLength) {
-        info.push(focalLength + "mm");
-      }
-
-      if (fNumber && (!model || !model.endsWith(fNumber.toString()))) {
-        info.push("ƒ/" + fNumber);
-      }
-
-      if (iso && model.length < 27) {
-        info.push("ISO " + iso);
-      }
-
-      if (exposure) {
-        info.push(exposure);
-      }
-
-      if (!info.length) {
-        return $gettext("Unknown");
-      }
-
-      return info.join(", ");
     }
-  );
+
+    if (focalLength) {
+      info.push(focalLength + "mm");
+    }
+
+    if (fNumber && (!model || !model.endsWith(fNumber.toString()))) {
+      info.push("ƒ/" + fNumber);
+    }
+
+    if (!info.length) {
+      return $gettext("Unknown");
+    }
+
+    return info.join(", ");
+  });
 
   getCamera() {
     if (this.Camera) {

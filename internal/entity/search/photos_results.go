@@ -86,6 +86,7 @@ type Photo struct {
 	FileDuration     time.Duration `json:"-" select:"files.file_duration"`
 	FileFPS          float64       `json:"-" select:"files.file_fps"`
 	FileFrames       int           `json:"-" select:"files.file_frames"`
+	FilePages        int           `json:"-" select:"files.file_pages"`
 	FileCodec        string        `json:"-" select:"files.file_codec"`
 	FileType         string        `json:"-" select:"files.file_type"`
 	MediaType        string        `json:"-" select:"files.media_type"`

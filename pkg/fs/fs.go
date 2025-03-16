@@ -106,6 +106,23 @@ func PathExists(path string) bool {
 	return m&os.ModeDir != 0 || m&os.ModeSymlink != 0
 }
 
+// DeviceExists tests if a path exists, and is a device.
+func DeviceExists(path string) bool {
+	if path == "" {
+		return false
+	}
+
+	info, err := os.Stat(path)
+
+	if err != nil {
+		return false
+	}
+
+	m := info.Mode()
+
+	return m&os.ModeDevice != 0 || m&os.ModeCharDevice != 0
+}
+
 // Writable checks if the path is accessible for reading and writing.
 func Writable(path string) bool {
 	if path == "" {

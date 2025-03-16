@@ -89,6 +89,8 @@ func (m *MediaFile) RelatedFiles(stripSequence bool) (result RelatedFiles, err e
 			result.Main = f
 		} else if f.IsVector() {
 			result.Main = f
+		} else if f.IsDocument() {
+			result.Main = f
 		} else if f.IsHeic() {
 			isHeic = true
 			result.Main = f

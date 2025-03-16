@@ -225,6 +225,12 @@ func OIDCRedirect(router *gin.RouterGroup) {
 			} else if err = avatar.SetUserImageURL(user, avatarUrl, entity.SrcOIDC, conf.ThumbCachePath()); err != nil {
 				event.AuditWarn([]string{clientIp, "create session", "oidc", userName, "failed to set avatar image", err.Error()})
 			}
+		} else if conf.UsersQuotaExceeded() {
+			userName = oidcUser.Username()
+			event.AuditWarn([]string{clientIp, "create session", "oidc", "create user", userName, authn.ErrUsersQuotaExceeded.Error()})
+			event.LoginError(clientIp, "oidc", userName, userAgent, authn.ErrUsersQuotaExceeded.Error())
+			c.HTML(http.StatusUnauthorized, "auth.gohtml", CreateSessionError(http.StatusUnauthorized, i18n.Error(i18n.ErrQuotaExceeded)))
+			return
 		} else if conf.OIDCRegister() {
 			// Create new user record.
 			user = &oidcUser

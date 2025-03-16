@@ -123,4 +123,10 @@ var DialectSQLite3 = Migrations{
 		Stage:      "pre",
 		Statements: []string{"ALTER TABLE photos RENAME COLUMN photo_description TO photo_caption;", "ALTER TABLE photos RENAME COLUMN description_src TO caption_src;"},
 	},
+	{
+		ID:         "20250315-000001",
+		Dialect:    "sqlite3",
+		Stage:      "pre",
+		Statements: []string{"ALTER TABLE auth_users_settings RENAME COLUMN default_page TO ui_start_page;"},
+	},
 }

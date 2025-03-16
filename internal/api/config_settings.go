@@ -73,24 +73,36 @@ func SaveSettings(router *gin.RouterGroup) {
 
 		// Only super admins can change global config defaults.
 		if s.User().IsSuperAdmin() {
+			// Update global defaults and user preferences.
+			user := s.User()
 			settings = conf.Settings()
 
+			// Set values from request.
 			if err := c.BindJSON(settings); err != nil {
 				AbortBadRequest(c)
 				return
 			}
 
+			// Update global defaults.
 			if err := settings.Save(conf.SettingsYaml()); err != nil {
 				log.Debugf("config: %s (save app settings)", err)
 				c.AbortWithStatusJSON(http.StatusInternalServerError, err)
 				return
 			}
 
-			// Flush session cache and update client config.
+			// Update user preferences.
+			if err := user.Settings().Apply(settings).Save(); err != nil {
+				log.Debugf("config: %s (save user settings)", err)
+				AbortSaveFailed(c)
+				return
+			}
+
+			// Flush session cache and update client config
+			// after global settings have been updated.
 			entity.FlushSessionCache()
 			UpdateClientConfig()
 		} else {
-			// Apply to user preferences and keep current values if unspecified.
+			// Update user preferences without changing global defaults.
 			user := s.User()
 
 			if user == nil {
@@ -100,11 +112,13 @@ func SaveSettings(router *gin.RouterGroup) {
 
 			settings = &customize.Settings{}
 
+			// Set values from request.
 			if err := c.BindJSON(settings); err != nil {
 				AbortBadRequest(c)
 				return
 			}
 
+			// Update user preferences.
 			if acl.Rules.DenyAll(acl.ResourceSettings, s.UserRole(), acl.Permissions{acl.ActionUpdate, acl.ActionManage}) {
 				c.JSON(http.StatusOK, user.Settings().Apply(settings).ApplyTo(conf.Settings().ApplyACL(acl.Rules, user.AclRole())))
 				return

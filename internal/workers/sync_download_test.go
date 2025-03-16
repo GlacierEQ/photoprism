@@ -12,18 +12,42 @@ import (
 )
 
 func TestSync_download(t *testing.T) {
-	conf := config.TestConfig()
+	t.Run("NotFound", func(t *testing.T) {
+		conf := config.TestConfig()
 
-	t.Logf("database-dsn: %s", conf.DatabaseDsn())
+		t.Logf("database-dsn: %s", conf.DatabaseDsn())
 
-	worker := NewSync(conf)
+		worker := NewSync(conf)
 
-	assert.IsType(t, &Sync{}, worker)
-	account := entity.ServiceFixtureWebdavDummy
+		assert.IsType(t, &Sync{}, worker)
+		account := entity.ServiceFixtureWebdavDummy
 
-	if _, err := worker.download(account); err != nil {
-		t.Fatal(err)
-	}
+		if complete, err := worker.download(account); err != nil {
+			t.Fatal(err)
+		} else {
+			assert.False(t, complete)
+
+		}
+	})
+	t.Run("QuotaExceeded", func(t *testing.T) {
+		conf := config.TestConfig()
+		conf.Options().FilesQuota = 1
+
+		t.Logf("database-dsn: %s", conf.DatabaseDsn())
+
+		worker := NewSync(conf)
+
+		assert.IsType(t, &Sync{}, worker)
+		account := entity.ServiceFixtureWebdavDummy
+
+		if complete, err := worker.download(account); err != nil {
+			t.Fatal(err)
+		} else {
+			assert.False(t, complete)
+
+		}
+		conf.Options().FilesQuota = 0
+	})
 }
 
 func TestSync_downloadPath(t *testing.T) {

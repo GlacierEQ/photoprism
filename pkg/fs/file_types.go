@@ -10,13 +10,9 @@ import (
 	_ "golang.org/x/image/webp"
 )
 
-// TypeUnknown is the default type used when a file cannot be classified.
-const TypeUnknown Type = ""
-
-// Supported media.Raw file types:
+// Supported media.Document file types:
 const (
-	ImageRaw Type = "raw" // RAW Image
-	ImageDng Type = "dng" // Adobe Digital Negative
+	DocumentPDF Type = "pdf" // Portable Document Format (PDF)
 )
 
 // Supported media.Image file types:
@@ -36,6 +32,32 @@ const (
 	ImageHeic   Type = "heic"  // High Efficiency Image Container (HEIC)
 	ImageHeicS  Type = "heics" // HEIC Image Sequence
 	ImageWebp   Type = "webp"  // Google WebP Image
+)
+
+// Supported media.Raw file types:
+const (
+	ImageRaw Type = "raw" // RAW Image
+	ImageDng Type = "dng" // Adobe Digital Negative
+)
+
+// Supported media.Sidecar file types:
+const (
+	SidecarYaml     Type = "yml"  // YAML metadata / config / sidecar file
+	SidecarJson     Type = "json" // JSON metadata / config / sidecar file
+	SidecarXml      Type = "xml"  // XML metadata / config / sidecar file
+	SidecarAppleXml Type = "aae"  // Apple image edits sidecar file (based on XML)
+	SidecarXMP      Type = "xmp"  // Adobe XMP sidecar file (XML)
+	SidecarText     Type = "txt"  // Text config / sidecar file
+	SidecarInfo     Type = "nfo"  // Info text file as used by e.g. Plex Media Server
+	SidecarMarkdown Type = "md"   // Markdown text sidecar file
+)
+
+// Supported media.Vector file types:
+const (
+	VectorAI  Type = "ai"  // Adobe Illustrator
+	VectorPS  Type = "ps"  // Adobe PostScript
+	VectorEPS Type = "eps" // Encapsulated PostScript
+	VectorSVG Type = "svg" // Scalable Vector Graphics
 )
 
 // Supported media.Video file types, see https://tools.woolyss.com/html5-canplaytype-tester/:
@@ -69,23 +91,5 @@ const (
 	VideoDV     Type = "dv"   // DV Video (https://en.wikipedia.org/wiki/DV)
 )
 
-// Supported media.Vector file types:
-const (
-	VectorAI  Type = "ai"  // Adobe Illustrator
-	VectorPS  Type = "ps"  // Adobe PostScript
-	VectorEPS Type = "eps" // Encapsulated PostScript
-	VectorPDF Type = "pdf" // Encapsulated PostScript
-	VectorSVG Type = "svg" // Scalable Vector Graphics
-)
-
-// Supported media.Sidecar file types:
-const (
-	SidecarYaml     Type = "yml"  // YAML metadata / config / sidecar file
-	SidecarJson     Type = "json" // JSON metadata / config / sidecar file
-	SidecarXml      Type = "xml"  // XML metadata / config / sidecar file
-	SidecarAppleXml Type = "aae"  // Apple image edits sidecar file (based on XML)
-	SidecarXMP      Type = "xmp"  // Adobe XMP sidecar file (XML)
-	SidecarText     Type = "txt"  // Text config / sidecar file
-	SidecarInfo     Type = "nfo"  // Info text file as used by e.g. Plex Media Server
-	SidecarMarkdown Type = "md"   // Markdown text sidecar file
-)
+// TypeUnknown is the default type used when a file cannot be classified.
+const TypeUnknown Type = ""

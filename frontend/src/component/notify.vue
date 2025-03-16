@@ -1,5 +1,6 @@
 <template>
-  <v-snackbar id="p-notify" v-model="visible" :color="message.color" :timeout="-1" variant="elevated" location="bottom">
+  <v-snackbar id="p-notify" v-model="visible" :timeout="-1" :class="'p-notify--' + message.color">
+    <v-icon v-if="message.icon" :icon="'mdi-' + message.icon" :color="message.color" start></v-icon>
     {{ message.text }}
     <template #actions>
       <v-btn icon="mdi-close" :color="'on-' + message.color" variant="text" @click="close"></v-btn>
@@ -13,8 +14,9 @@ export default {
     return {
       visible: false,
       message: {
-        text: "",
+        icon: "",
         color: "transparent",
+        text: "",
       },
       messages: [],
       lastText: "",
@@ -69,23 +71,23 @@ export default {
       }
     },
 
-    addWarningMessage: function (message) {
-      this.addMessage("warning", message, 3000);
-    },
-
-    addErrorMessage: function (message) {
-      this.addMessage("error", message, 8000);
-    },
-
     addSuccessMessage: function (message) {
-      this.addMessage("success", message, 2000);
+      this.addMessage("success", "check-circle", message, 2000);
     },
 
     addInfoMessage: function (message) {
-      this.addMessage("info", message, 2000);
+      this.addMessage("info", "information-outline", message, 2000);
     },
 
-    addMessage: function (color, text, delay) {
+    addWarningMessage: function (message) {
+      this.addMessage("warning", "alert", message, 3000);
+    },
+
+    addErrorMessage: function (message) {
+      this.addMessage("error", "alert-circle-outline", message, 8000);
+    },
+
+    addMessage: function (color, icon, text, delay) {
       if (text === this.lastText) return;
 
       this.lastId++;
@@ -93,8 +95,9 @@ export default {
 
       const m = {
         id: this.lastId,
-        text,
         color,
+        icon,
+        text,
         delay,
       };
 
@@ -118,6 +121,10 @@ export default {
           this.message.color = this.defaultColor;
         }
 
+        if (!this.message.icon) {
+          this.message.icon = "";
+        }
+
         this.visible = true;
 
         if (message.delay > 0) {
@@ -128,10 +135,6 @@ export default {
         }
       } else {
         this.visible = false;
-        this.$nextTick(function () {
-          this.message.text = "";
-          this.message.color = "transparent";
-        });
       }
     },
   },

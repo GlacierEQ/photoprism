@@ -4,8 +4,7 @@ type TypeMap map[Type]string
 
 // TypeInfo contains human-readable descriptions for supported file formats
 var TypeInfo = TypeMap{
-	ImageRaw:        "Unprocessed Sensor Data",
-	ImageDng:        "Adobe Digital Negative",
+	DocumentPDF:     "Portable Document Format (PDF)",
 	ImageJpeg:       "Joint Photographic Experts Group (JPEG)",
 	ImageJpegXL:     "JPEG XL",
 	ImageThumb:      "Thumbnail Image",
@@ -21,6 +20,12 @@ var TypeInfo = TypeMap{
 	ImageHeic:       "High Efficiency Image Container",
 	ImageHeicS:      "HEIC Image Sequence",
 	ImageWebp:       "Google WebP",
+	ImageDng:        "Adobe Digital Negative",
+	ImageRaw:        "Unprocessed Sensor Data",
+	VectorSVG:       "Scalable Vector Graphics",
+	VectorAI:        "Adobe Illustrator",
+	VectorPS:        "Adobe PostScript",
+	VectorEPS:       "Encapsulated PostScript",
 	VideoWebm:       "Google WebM",
 	VideoMp2:        "MPEG 2 (H.262)",
 	VideoAvc:        "Advanced Video Coding (H.264, MPEG-4 Part 10)",
@@ -48,10 +53,6 @@ var TypeInfo = TypeMap{
 	VideoAvcHD:      "Advanced Video Coding High Definition (AVCHD)",
 	VideoBDAV:       "Blu-ray MPEG-2 Transport Stream",
 	VideoTheora:     "Ogg Media (OGG)",
-	VectorSVG:       "Scalable Vector Graphics",
-	VectorAI:        "Adobe Illustrator",
-	VectorPS:        "Adobe PostScript",
-	VectorEPS:       "Encapsulated PostScript",
 	SidecarXMP:      "Adobe Extensible Metadata Platform",
 	SidecarAppleXml: "Apple Image Edits XML",
 	SidecarXml:      "Extensible Markup Language",

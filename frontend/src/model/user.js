@@ -32,6 +32,8 @@ import { T, $gettext } from "common/gettext";
 import { Form } from "common/form";
 import { $config } from "app/session";
 
+export let BatchSize = 99999;
+
 export class User extends RestModel {
   getDefaults() {
     return {
@@ -345,6 +347,10 @@ export class User extends RestModel {
         params,
       })
       .then((response) => Promise.resolve(response.data));
+  }
+
+  static batchSize() {
+    return BatchSize;
   }
 
   static getCollectionResource() {

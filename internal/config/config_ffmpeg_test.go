@@ -12,7 +12,7 @@ import (
 
 func TestConfig_FFmpegEncoder(t *testing.T) {
 	c := NewConfig(CliTestContext())
-	assert.Equal(t, encode.SoftwareAvc, c.FFmpegEncoder())
+	assert.Equal(t, encode.DefaultAvcEncoder(), c.FFmpegEncoder())
 	c.options.FFmpegEncoder = "nvidia"
 	assert.Equal(t, encode.NvidiaAvc, c.FFmpegEncoder())
 	c.options.FFmpegEncoder = "intel"
@@ -20,7 +20,7 @@ func TestConfig_FFmpegEncoder(t *testing.T) {
 	c.options.FFmpegEncoder = "xxx"
 	assert.Equal(t, encode.SoftwareAvc, c.FFmpegEncoder())
 	c.options.FFmpegEncoder = ""
-	assert.Equal(t, encode.SoftwareAvc, c.FFmpegEncoder())
+	assert.Equal(t, encode.DefaultAvcEncoder(), c.FFmpegEncoder())
 }
 
 func TestConfig_FFmpegEnabled(t *testing.T) {

@@ -113,9 +113,7 @@
         <h3>Getting Started</h3>
         <p>
           Follow our
-          <a href="https://docs.photoprism.app/user-guide/first-steps/" class="text-link" target="_blank"
-            >First Steps 👣</a
-          >
+          <a :href="links.firstSteps" class="text-link" target="_blank">First Steps 👣</a>
           tutorial to learn how to navigate the user interface and ensure your library is indexed according to your
           individual preferences. Additional help and product-specific information can be found in our
           <a href="https://www.photoprism.app/plus/kb" class="text-link" target="_blank">Knowledge Base</a>.
@@ -124,12 +122,10 @@
         <h3>User Guide</h3>
         <p>
           Visit
-          <a href="https://link.photoprism.app/docs" class="text-link" target="_blank"
-            >docs.photoprism.app/user-guide</a
-          >
+          <a :href="links.docs" class="text-link" target="_blank">docs.photoprism.app/user-guide</a>
           to learn how to sync, organize, and share your pictures. Our
-          <a href="https://docs.photoprism.app/user-guide/" class="text-link" target="_blank">User Guide</a> also covers
-          many advanced topics, such as
+          <a :href="links.userGuide" class="text-link" target="_blank">User Guide</a> also covers many advanced topics,
+          such as
           <a href="https://docs.photoprism.app/user-guide/use-cases/google/" class="text-link" target="_blank"
             >migrating from Google Photos</a
           >
@@ -137,7 +133,7 @@
           <a href="https://docs.photoprism.app/user-guide/settings/advanced/#images" class="text-link" target="_blank"
             >thumbnail quality settings</a
           >. Common issues can be quickly diagnosed and solved using the troubleshooting checklists we provide at
-          <a href="https://docs.photoprism.app/getting-started/troubleshooting/" class="text-link" target="_blank"
+          <a :href="links.troubleshooting" class="text-link" target="_blank"
             >docs.photoprism.app/getting-started/troubleshooting</a
           >.
         </p>
@@ -145,9 +141,7 @@
         <h3>Getting Support</h3>
         <p>
           Before reporting a bug, please use our
-          <a href="https://docs.photoprism.app/getting-started/troubleshooting/" class="text-link" target="_blank"
-            >Troubleshooting Checklists</a
-          >
+          <a :href="links.troubleshooting" class="text-link" target="_blank">Troubleshooting Checklists</a>
           to determine the cause of your problem. If you have a general question, need help, it could be a local
           configuration issue, or a misunderstanding in how the software works, you are welcome to ask in our
           <a href="https://link.photoprism.app/chat" class="text-link" target="_blank">Community Chat</a> or post your
@@ -156,9 +150,7 @@
         </p>
         <p>
           When reporting a problem, always include the software versions you are using and
-          <a href="https://www.photoprism.app/kb/reporting-bugs" class="text-link" target="_blank"
-            >other information about your environment</a
-          >
+          <a :href="links.bugs" class="text-link" target="_blank">other information about your environment</a>
           such as
           <a
             href="https://docs.photoprism.app/getting-started/troubleshooting/browsers/"
@@ -175,11 +167,9 @@
         <h3>Developer Guide</h3>
         <p>
           Our
-          <a href="https://docs.photoprism.app/developer-guide/" class="text-link" target="_blank">Developer Guide</a>
+          <a :href="links.developerGuide" class="text-link" target="_blank">Developer Guide</a>
           contains all the information you need to get started as a developer. It guides you from
-          <a href="https://docs.photoprism.app/developer-guide/setup/" class="text-link" target="_blank"
-            >setting up your development environment</a
-          >
+          <a :href="links.developerSetup" class="text-link" target="_blank">setting up your development environment</a>
           and
           <a href="https://docs.photoprism.app/developer-guide/pull-requests/" class="text-link" target="_blank"
             >creating pull requests</a
@@ -238,6 +228,8 @@
 </template>
 
 <script>
+import links from "common/links";
+
 import PAboutFooter from "component/about/footer.vue";
 
 export default {
@@ -252,6 +244,7 @@ export default {
     const isPublic = this.$config.isPublic();
     const isSuperAdmin = this.$session.isSuperAdmin();
     return {
+      links,
       rtl: this.$isRtl,
       tier: tier,
       membership: membership,

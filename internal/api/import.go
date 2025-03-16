@@ -49,8 +49,16 @@ func StartImport(router *gin.RouterGroup) {
 
 		conf := get.Config()
 
+		// Abort in read-only mode and/or when the import feature is disabled.
 		if conf.ReadOnly() || !conf.Settings().Features.Import {
 			AbortFeatureDisabled(c)
+			return
+		}
+
+		// Abort if there is not enough free storage to import new files.
+		if conf.FilesQuotaExceeded() {
+			event.AuditErr([]string{ClientIP(c), "session %s", "import files", "insufficient storage"}, s.RefID)
+			Abort(c, http.StatusInsufficientStorage, i18n.ErrInsufficientStorage)
 			return
 		}
 

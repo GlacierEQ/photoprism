@@ -30,6 +30,21 @@
 
             <v-col cols="12" sm="6">
               <v-select
+                v-model="settings.ui.startPage"
+                :disabled="busy"
+                :items="options.StartPages(settings.features)"
+                item-title="text"
+                item-value="value"
+                :label="$gettext('Start Page')"
+                :menu-props="{ maxHeight: 346 }"
+                hide-details
+                class="input-startpage"
+                @update:model-value="onChange"
+              ></v-select>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <v-select
                 v-model="settings.ui.language"
                 :disabled="busy"
                 :items="languages"
@@ -40,6 +55,20 @@
                 hide-details
                 class="input-language"
                 @update:model-value="onChange"
+              ></v-select>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <v-select
+                v-model="settings.ui.timeZone"
+                :disabled="busy"
+                item-value="ID"
+                item-title="Name"
+                :items="options.TimeZones($gettext('Default'))"
+                :label="$gettext('Time Zone')"
+                :menu-props="{ maxHeight: 346 }"
+                class="input-timezone"
+                @update:model-value="onChangeTheme"
               ></v-select>
             </v-col>
           </v-row>
@@ -58,6 +87,21 @@
                 :label="$gettext('People')"
                 :hint="$gettext('Recognize faces so people can be assigned and found.')"
                 prepend-icon="mdi-account"
+                persistent-hint
+                @update:model-value="onChange"
+              >
+              </v-checkbox>
+            </v-col>
+
+            <v-col cols="12" sm="6" lg="3" class="px-2 pb-2 pt-2">
+              <v-checkbox
+                v-model="settings.features.calendar"
+                :disabled="busy"
+                class="ma-0 pa-0 input-calendar"
+                density="compact"
+                :label="$gettext('Calendar')"
+                :hint="$gettext('Browse and share your pictures organized into monthly albums.')"
+                prepend-icon="mdi-calendar"
                 persistent-hint
                 @update:model-value="onChange"
               >
@@ -347,61 +391,6 @@
           </v-row>
         </v-card-actions>
       </v-card>
-
-      <v-card v-if="settings.features.download" flat tile class="mt-0 px-1 bg-background">
-        <v-card-title class="pb-0 text-subtitle-2">
-          {{ $gettext(`Download`) }}
-        </v-card-title>
-
-        <v-card-actions>
-          <v-row align="start" dense>
-            <v-col cols="12" sm="4" class="px-2 pb-2 pt-2">
-              <v-checkbox
-                v-model="settings.download.originals"
-                :disabled="busy"
-                class="ma-0 pa-0 input-download-originals"
-                density="compact"
-                :label="$gettext('Originals')"
-                :hint="$gettext('Download only original media files, without any automatically generated files.')"
-                prepend-icon="mdi-camera-iris"
-                persistent-hint
-                @update:model-value="onChange"
-              >
-              </v-checkbox>
-            </v-col>
-
-            <v-col cols="12" sm="4" class="px-2 pb-2 pt-2">
-              <v-checkbox
-                v-model="settings.download.mediaRaw"
-                :disabled="busy"
-                class="ma-0 pa-0 input-download-raw"
-                density="compact"
-                :label="$gettext('RAW')"
-                :hint="$gettext('Include RAW image files when downloading stacks and archives.')"
-                prepend-icon="mdi-raw"
-                persistent-hint
-                @update:model-value="onChange"
-              >
-              </v-checkbox>
-            </v-col>
-
-            <v-col cols="12" sm="4" class="px-2 pb-2 pt-2">
-              <v-checkbox
-                v-model="settings.download.mediaSidecar"
-                :disabled="busy"
-                class="ma-0 pa-0 input-download-sidecar"
-                density="compact"
-                :label="$gettext('Sidecar')"
-                :hint="$gettext('Include sidecar files when downloading stacks and archives.')"
-                prepend-icon="mdi-paperclip"
-                persistent-hint
-                @update:model-value="onChange"
-              >
-              </v-checkbox>
-            </v-col>
-          </v-row>
-        </v-card-actions>
-      </v-card>
     </v-form>
     <p-about-footer></p-about-footer>
     <p-confirm-sponsor :visible="dialog.sponsor" @close="dialog.sponsor = false"></p-confirm-sponsor>
@@ -423,7 +412,8 @@ export default {
   },
   data() {
     return {
-      isDemo: this.$config.get("demo"),
+      isDemo: this.$config.isDemo(),
+      isAdmin: this.$session.isAdmin(),
       isSuperAdmin: this.$session.isSuperAdmin(),
       isPublic: this.$config.get("public"),
       config: this.$config.values,

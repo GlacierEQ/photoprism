@@ -59,6 +59,7 @@ export class File extends RestModel {
       Duration: 0,
       FPS: 0.0,
       Frames: 0,
+      Pages: 0,
       Width: 0,
       Height: 0,
       Orientation: 0,

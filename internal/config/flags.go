@@ -274,14 +274,8 @@ var Flags = CliFlags{
 		}}, {
 		Flag: &cli.Uint64Flag{
 			Name:    "files-quota",
-			Usage:   "maximum aggregated size of all indexed files in `MB` (0 to disable)",
+			Usage:   "maximum aggregated size of all indexed files in `GB` (0 for unlimited)",
 			EnvVars: EnvVars("FILES_QUOTA"),
-		}}, {
-		Flag: &cli.IntFlag{
-			Name:    "users-quota",
-			Usage:   "maximum number of registered user accounts, excluding guests (0 to disable)",
-			EnvVars: EnvVars("USERS_QUOTA"),
-			Hidden:  true,
 		}}, {
 		Flag: &cli.StringFlag{
 			Name:    "backup-path",

@@ -81,7 +81,7 @@ func WebDAV(dir string, router *gin.RouterGroup, conf *config.Config) {
 		}
 	}
 
-	// WebDAV request handler.
+	// Create WebDAV request handler.
 	srv := &webdav.Handler{
 		Prefix:     router.BasePath(),
 		FileSystem: fileSystem,
@@ -89,8 +89,19 @@ func WebDAV(dir string, router *gin.RouterGroup, conf *config.Config) {
 		Logger:     loggerFunc,
 	}
 
-	// Request handler wrapper function.
+	// Wrap handler to check quota and permissions.
 	handlerFunc := func(c *gin.Context) {
+		// Abort PUT, POST, PATCH, and COPY requests if there
+		// is not enough free storage to upload new files.
+		switch c.Request.Method {
+		case MethodPut, MethodPost, MethodPatch, MethodCopy:
+			if conf.FilesQuotaExceeded() {
+				c.AbortWithStatus(http.StatusInsufficientStorage)
+				return
+			}
+		}
+
+		// Invoke handler callback.
 		WebDAVHandler(c, router, srv)
 	}
 

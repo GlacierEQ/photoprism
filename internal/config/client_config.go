@@ -105,6 +105,11 @@ func (c *ClientConfig) ApplyACL(a acl.ACL, r acl.Role) *ClientConfig {
 
 	c.ACL = a.Grants(r)
 
+	if !c.ACL[acl.ResourceUsers].Allow(acl.ActionView) {
+		c.Usage.UsersFreePct = -1
+		c.Usage.UsersUsedPct = -1
+	}
+
 	return c
 }
 

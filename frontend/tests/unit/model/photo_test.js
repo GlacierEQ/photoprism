@@ -1157,7 +1157,8 @@ describe("model/photo", () => {
       ID: 10,
       UID: "ABC127",
       CameraMake: "Canon",
-      CameraModel: "abcde",
+      CameraModel: "EOS 6D",
+      Iso: 100,
       Files: [
         {
           UID: "123fgb",
@@ -1173,10 +1174,13 @@ describe("model/photo", () => {
       ],
     };
     const photo3 = new Photo(values3);
-    assert.equal(photo3.getCameraInfo(), "Canon abcde, AVC, 500 × 600");
+    assert.equal(photo3.getCameraInfo(), "Canon EOS 6D, ISO 100");
     const values4 = {
       ID: 10,
       UID: "ABC127",
+      CameraID: 2,
+      CameraMake: "Canon",
+      Iso: 200,
       Files: [
         {
           UID: "123fgb",
@@ -1205,7 +1209,7 @@ describe("model/photo", () => {
       ],
     };
     const photo4 = new Photo(values4);
-    assert.equal(photo3.getCameraInfo(), "Canon abcde, AVC, 500 × 600");
+    assert.equal(photo4.getCameraInfo(), "Canon, ISO 200");
   });
 
   it("should return lens info", () => {
@@ -1264,7 +1268,7 @@ describe("model/photo", () => {
       Files: [],
     };
     const photo = new Photo(values);
-    assert.equal(photo.getLensInfo(), "EF50mm ƒ/1.8 II, 50mm, ƒ/2.8, ISO 100, 1/1600");
+    assert.equal(photo.getLensInfo(), "EF50mm ƒ/1.8 II, 50mm, ƒ/2.8");
   });
 
   it("should archive photo", () => {

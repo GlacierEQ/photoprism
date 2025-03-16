@@ -92,24 +92,24 @@
         </div>
       </div>
     </div>
-    <p-confirm-action
+    <p-confirm-dialog
       :visible="confirm.visible"
       icon="mdi-account-plus"
       :icon-size="42"
       :text="confirm?.model?.Name ? $gettext('Add %{s}?', { s: confirm.model.Name }) : $gettext('Add person?')"
       @close="onCancelSetName"
       @confirm="onConfirmSetName"
-    ></p-confirm-action>
+    ></p-confirm-dialog>
   </div>
 </template>
 
 <script>
 import Marker from "model/marker";
-import PConfirmAction from "component/confirm/action.vue";
+import PConfirmDialog from "component/confirm/dialog.vue";
 
 export default {
   name: "PTabPhotoPeople",
-  components: { PConfirmAction },
+  components: { PConfirmDialog },
   props: {
     uid: {
       type: String,

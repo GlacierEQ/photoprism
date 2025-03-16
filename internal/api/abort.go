@@ -106,6 +106,10 @@ func AbortFeatureDisabled(c *gin.Context) {
 	Abort(c, http.StatusForbidden, i18n.ErrFeatureDisabled)
 }
 
+func AbortQuotaExceeded(c *gin.Context) {
+	Abort(c, http.StatusForbidden, i18n.ErrQuotaExceeded)
+}
+
 func AbortBusy(c *gin.Context) {
 	Abort(c, http.StatusTooManyRequests, i18n.ErrBusy)
 }

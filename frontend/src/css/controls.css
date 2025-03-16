@@ -215,6 +215,17 @@ table td > .action-buttons {
     }
 }
 
+/* Action Menu */
+
+.p-action-menu .v-overlay__content {
+    border-radius: 8px;
+}
+
+.p-action-menu .action-menu__list {
+    min-width: 108px;
+    opacity: 0.97;
+}
+
 /* Table Actions */
 
 table .table-actions {
@@ -230,3 +241,4 @@ table .table-actions {
         gap: 12px;
     }
 }
+

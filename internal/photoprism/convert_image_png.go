@@ -58,13 +58,20 @@ func (w *Convert) PngConvertCmds(f *MediaFile, pngName string) (result ConvertCm
 		result = append(result, NewConvertCmd(
 			exec.Command(w.conf.RsvgConvertBin(), args...)),
 		)
-	} else if w.conf.ImageMagickEnabled() && w.imageMagickExclude.Allow(fileExt) &&
-		(f.IsImage() && !f.IsJpegXL() && !f.IsRaw() && !f.IsHeif() || f.IsVector() && w.conf.VectorEnabled()) {
-		resize := fmt.Sprintf("%dx%d>", w.conf.PngSize(), w.conf.PngSize())
-		args := []string{f.FileName(), "-flatten", "-resize", resize, pngName}
-		result = append(result, NewConvertCmd(
-			exec.Command(w.conf.ImageMagickBin(), args...)),
-		)
+	} else if w.conf.ImageMagickEnabled() && w.imageMagickExclude.Allow(fileExt) {
+		if f.IsImage() && !f.IsJpegXL() && !f.IsRaw() && !f.IsHeif() || f.IsVector() && w.conf.VectorEnabled() {
+			resize := fmt.Sprintf("%dx%d>", w.conf.PngSize(), w.conf.PngSize())
+			args := []string{f.FileName(), "-flatten", "-resize", resize, pngName}
+			result = append(result, NewConvertCmd(
+				exec.Command(w.conf.ImageMagickBin(), args...)),
+			)
+		} else if f.IsDocument() {
+			resize := fmt.Sprintf("%dx%d>", w.conf.PngSize(), w.conf.PngSize())
+			args := []string{f.FileName() + "[0]", "-background", "white", "-alpha", "remove", "-alpha", "off", "-resize", resize, pngName}
+			result = append(result, NewConvertCmd(
+				exec.Command(w.conf.ImageMagickBin(), args...)),
+			)
+		}
 	}
 
 	// No suitable converter found?

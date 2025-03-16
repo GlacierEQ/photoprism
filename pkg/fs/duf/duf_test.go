@@ -63,6 +63,28 @@ func TestPathInfo(t *testing.T) {
 		assert.NotEmpty(t, result.BlockSize)
 		assert.NotEmpty(t, result.Metadata)
 	})
+	t.Run("NotFound", func(t *testing.T) {
+		// Get slice of mounted file systems.
+		result, err := PathInfo("notfound")
+
+		assert.Error(t, err)
+
+		// Check result for plausibility.
+		assert.Empty(t, result.Device)
+		assert.Empty(t, result.DeviceType)
+		assert.Empty(t, result.Mountpoint)
+		assert.Empty(t, result.Fstype)
+		assert.Empty(t, result.Opts)
+		assert.Empty(t, result.Total)
+		assert.Empty(t, result.Used)
+		assert.Empty(t, result.Free)
+		assert.Empty(t, result.Inodes)
+		assert.Empty(t, result.InodesFree)
+		assert.Empty(t, result.InodesUsed)
+		assert.Empty(t, result.Blocks)
+		assert.Empty(t, result.BlockSize)
+		assert.Empty(t, result.Metadata)
+	})
 }
 
 func TestFindByPath(t *testing.T) {
@@ -94,6 +116,18 @@ func TestFindByPath(t *testing.T) {
 			assert.NotEmpty(t, result.Blocks)
 			assert.NotEmpty(t, result.BlockSize)
 			assert.NotEmpty(t, result.Metadata)
+		}
+	})
+	t.Run("Empty", func(t *testing.T) {
+		// Get slice of mounted file systems.
+		results, warnings, err := FindByPath("")
+
+		assert.Error(t, err)
+		assert.Empty(t, warnings)
+
+		// No mount returned?
+		if len(results) > 0 {
+			t.Error("no result expected expected")
 		}
 	})
 }

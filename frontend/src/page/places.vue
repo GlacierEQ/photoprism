@@ -49,6 +49,7 @@
           ></v-text-field>
         </div>
       </div>
+      <div ref="background" class="map-background"></div>
       <div ref="map" class="map-container" :class="{ 'map-loaded': initialized }"></div>
       <div v-if="showCluster" class="cluster-control">
         <v-card class="cluster-control-container">
@@ -62,6 +63,7 @@
 <script>
 import maplibregl from "maplibre-gl";
 import $api from "common/api";
+import * as sky from "common/sky";
 import Thumb from "model/thumb";
 import PPagePhotos from "page/photos.vue";
 import MapStyleControl from "component/places/style-control";
@@ -161,6 +163,7 @@ export default {
       .then(() => {
         this.renderMap();
         this.openClusterFromUrl();
+        this.renderSky();
       })
       .catch((err) => {
         this.mapError = err;
@@ -170,6 +173,13 @@ export default {
     this.$view.leave(this);
   },
   methods: {
+    renderSky() {
+      if (sky.render && this.$refs.background) {
+        this.$nextTick(() => {
+          sky.render(this.$refs.background, 320);
+        });
+      }
+    },
     onKeyDown(ev) {
       if (!ev || !(ev instanceof KeyboardEvent) || !this.$view.isActive(this)) {
         return;

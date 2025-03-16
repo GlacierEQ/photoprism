@@ -20,8 +20,8 @@
       class="p-page__navigation"
     />
 
-    <div v-if="loading" class="pa-6">
-      <v-progress-linear :indeterminate="true"></v-progress-linear>
+    <div v-if="loading" class="p-page__loading">
+      <p-loading></p-loading>
     </div>
     <div v-else class="p-page__content">
       <p-scroll
@@ -81,6 +81,7 @@ import PPhotoClipboard from "component/photo/clipboard.vue";
 import PPhotoViewCards from "component/photo/view/cards.vue";
 import PPhotoViewMosaic from "component/photo/view/mosaic.vue";
 import PPhotoViewList from "component/photo/view/list.vue";
+import PLoading from "component/loading.vue";
 import PScroll from "component/scroll.vue";
 
 export default {
@@ -91,6 +92,7 @@ export default {
     PPhotoViewCards,
     PPhotoViewMosaic,
     PPhotoViewList,
+    PLoading,
     PScroll,
   },
   props: {

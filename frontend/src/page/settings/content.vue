@@ -1,5 +1,5 @@
 <template>
-  <div class="p-tab p-settings-library py-2">
+  <div class="p-tab p-settings-content py-2">
     <v-form
       ref="form"
       validate-on="invalid-input"
@@ -7,7 +7,7 @@
       accept-charset="UTF-8"
       @submit.prevent="onChange"
     >
-      <v-card flat tile class="mt-0 px-1 bg-background">
+      <v-card v-if="isSuperAdmin" flat tile class="mt-0 px-1 bg-background">
         <v-card-title class="pb-0 text-subtitle-2">
           {{ $gettext(`Index`) }}
         </v-card-title>
@@ -53,7 +53,7 @@
             <v-col cols="12" sm="4">
               <v-checkbox
                 v-model="settings.index.convert"
-                :disabled="busy || demo || (!experimental && settings.index.convert)"
+                :disabled="busy || isDemo || (!experimental && settings.index.convert)"
                 class="ma-0 pa-0 input-convert"
                 density="compact"
                 color="surface-variant"
@@ -69,7 +69,7 @@
         </v-card-actions>
       </v-card>
 
-      <v-card flat tile class="mt-0 px-1 bg-background">
+      <v-card v-if="isSuperAdmin" flat tile class="mt-0 px-1 bg-background">
         <v-card-title class="pb-0 text-subtitle-2">
           {{ $gettext(`Stacks`) }}
         </v-card-title>
@@ -130,6 +130,116 @@
           </v-row>
         </v-card-actions>
       </v-card>
+
+      <v-card flat tile class="mt-0 px-1 bg-background">
+        <v-card-title class="pb-0 text-subtitle-2">
+          {{ $gettext(`Search`) }}
+        </v-card-title>
+
+        <v-card-actions>
+          <v-row align="start" dense>
+            <v-col cols="12" sm="4" class="px-2 pb-2 pt-2">
+              <v-checkbox
+                v-model="settings.search.listView"
+                :disabled="busy"
+                class="ma-0 pa-0 input-search-listview"
+                density="compact"
+                :label="$gettext('List View')"
+                :hint="$gettext('View search results as a list.')"
+                prepend-icon="mdi-view-list"
+                persistent-hint
+                @update:model-value="onChange"
+              >
+              </v-checkbox>
+            </v-col>
+
+            <v-col cols="12" sm="4" class="px-2 pb-2 pt-2">
+              <v-checkbox
+                v-model="settings.search.showTitles"
+                :disabled="busy"
+                class="ma-0 pa-0 input-search-titles"
+                density="compact"
+                :label="$gettext('Titles')"
+                :hint="$gettext('Show picture titles in search results.')"
+                prepend-icon="mdi-format-text"
+                persistent-hint
+                @update:model-value="onChange"
+              >
+              </v-checkbox>
+            </v-col>
+
+            <v-col cols="12" sm="4" class="px-2 pb-2 pt-2">
+              <v-checkbox
+                v-model="settings.search.showCaptions"
+                :disabled="busy"
+                class="ma-0 pa-0 input-search-captions"
+                density="compact"
+                :label="$gettext('Captions')"
+                :hint="$gettext('Show picture captions in search results.')"
+                prepend-icon="mdi-text"
+                persistent-hint
+                @update:model-value="onChange"
+              >
+              </v-checkbox>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </v-card>
+
+      <v-card v-if="settings.features.library && settings.features.download" flat tile class="mt-0 px-1 bg-background">
+        <v-card-title class="pb-0 text-subtitle-2">
+          {{ $gettext(`Download`) }}
+        </v-card-title>
+
+        <v-card-actions>
+          <v-row align="start" dense>
+            <v-col cols="12" sm="4" class="px-2 pb-2 pt-2">
+              <v-checkbox
+                v-model="settings.download.originals"
+                :disabled="busy"
+                class="ma-0 pa-0 input-download-originals"
+                density="compact"
+                :label="$gettext('Originals')"
+                :hint="$gettext('Download only original media files, without any automatically generated files.')"
+                prepend-icon="mdi-camera"
+                persistent-hint
+                @update:model-value="onChange"
+              >
+              </v-checkbox>
+            </v-col>
+
+            <v-col cols="12" sm="4" class="px-2 pb-2 pt-2">
+              <v-checkbox
+                v-model="settings.download.mediaRaw"
+                :disabled="busy"
+                class="ma-0 pa-0 input-download-raw"
+                density="compact"
+                :label="$gettext('RAW')"
+                :hint="$gettext('Include RAW image files when downloading stacks and archives.')"
+                prepend-icon="mdi-raw"
+                persistent-hint
+                @update:model-value="onChange"
+              >
+              </v-checkbox>
+            </v-col>
+
+            <v-col cols="12" sm="4" class="px-2 pb-2 pt-2">
+              <v-checkbox
+                v-model="settings.download.mediaSidecar"
+                :disabled="busy"
+                class="ma-0 pa-0 input-download-sidecar"
+                density="compact"
+                :label="$gettext('Sidecar')"
+                :hint="$gettext('Include sidecar files when downloading stacks and archives.')"
+                prepend-icon="mdi-paperclip"
+                persistent-hint
+                @update:model-value="onChange"
+              >
+              </v-checkbox>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </v-card>
     </v-form>
 
     <p-about-footer></p-about-footer>
@@ -142,15 +252,15 @@ import * as options from "options/options";
 import PAboutFooter from "component/about/footer.vue";
 
 export default {
-  name: "PSettingsLibrary",
+  name: "PSettingsContent",
   components: {
     PAboutFooter,
   },
   data() {
-    const isDemo = this.$config.get("demo");
-
     return {
-      demo: isDemo,
+      isDemo: this.$config.isDemo(),
+      isAdmin: this.$session.isAdmin(),
+      isSuperAdmin: this.$session.isSuperAdmin(),
       readonly: this.$config.get("readonly"),
       experimental: this.$config.get("experimental"),
       config: this.$config.values,

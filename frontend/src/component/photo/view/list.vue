@@ -2,7 +2,7 @@
   <div>
     <div v-if="photos.length === 0" class="pa-3">
       <v-alert
-        color="primary"
+        color="surface-variant"
         :icon="isSharedView ? 'mdi-image-off' : 'mdi-lightbulb-outline'"
         class="no-results"
         variant="outlined"
@@ -43,7 +43,7 @@
               <tr>
                 <th class="p-col-select"></th>
                 <th class="text-start">
-                  {{ $gettext("Title") }}
+                  {{ showTitles ? $gettext("Title") : $gettext("File Name") }}
                 </th>
                 <th class="text-start hidden-xs">
                   {{ $gettext("Taken") }}
@@ -82,22 +82,17 @@
                       @click.stop.prevent="openPhoto(index, false)"
                     >
                       <i v-if="m.Type === 'live'" class="action-live" :title="$gettext('Live')"><icon-live-photo /></i>
-                      <i v-if="m.Type === 'animated'" class="mdi mdi-file-gif-box" :title="$gettext('Animated')" />
-                      <i
-                        v-if="m.Type === 'vector'"
-                        class="action-vector mdi mdi-vector-polyline"
-                        :title="$gettext('Vector')"
-                      ></i>
-                      <i v-if="m.Type === 'video'" class="mdi mdi-play" :title="$gettext('Video')" />
+                      <i v-else-if="m.Type === 'animated'" class="mdi mdi-file-gif-box" :title="$gettext('Animated')" />
+                      <i v-else-if="m.Type === 'video'" class="mdi mdi-play" :title="$gettext('Video')" />
                     </button>
                   </div>
                 </td>
                 <td
                   class="meta-data meta-title clickable"
-                  :data-uid="m.UID"
+                  :title="m.Title"
                   @click.exact="isSharedView ? openPhoto(index) : editPhoto(index)"
                 >
-                  {{ m.Title }}
+                  {{ showTitles && m.Title ? m.Title : m.getOriginalName() }}
                 </td>
                 <td class="meta-data meta-date hidden-xs" :title="m.getDateString()">
                   <button @click.stop.prevent="openDate(index)">
@@ -130,24 +125,11 @@
                         density="comfortable"
                         variant="text"
                         :ripple="false"
-                        :data-uid="m.UID"
                         class="input-favorite"
                         @click.stop.prevent="m.toggleLike()"
                       >
-                        <v-icon
-                          v-if="m.Favorite"
-                          icon="mdi-star"
-                          color="favorite"
-                          :data-uid="m.UID"
-                          class="favorite-on"
-                        ></v-icon>
-                        <v-icon
-                          v-else
-                          icon="mdi-star-outline"
-                          color="surface"
-                          :data-uid="m.UID"
-                          class="favorite-off"
-                        ></v-icon>
+                        <v-icon v-if="m.Favorite" icon="mdi-star" color="favorite" class="favorite-on"></v-icon>
+                        <v-icon v-else icon="mdi-star-outline" color="surface" class="favorite-off"></v-icon>
                       </v-btn>
                     </template>
                   </div>
@@ -220,8 +202,13 @@ export default {
         " " +
         this.$gettext("Non-photographic and low-quality images require a review before they appear in search results.");
     }
+    const settings = this.$config.getSettings();
+    const showTitles = settings.search.showTitles;
+    const showCaptions = settings.search.showCaptions;
 
     return {
+      showTitles,
+      showCaptions,
       config: this.$config.values,
       notFoundMessage: m,
       showName: this.filter.order === "name",

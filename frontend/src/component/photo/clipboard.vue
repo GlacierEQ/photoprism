@@ -162,11 +162,14 @@
       @close="dialog.archive = false"
       @confirm="batchArchive"
     ></p-photo-archive-dialog>
-    <p-photo-delete-dialog
+    <p-confirm-dialog
       :visible="dialog.delete"
+      :text="$gettext(`Are you sure you want to permanently delete these pictures?`)"
+      :action="$gettext('Yes')"
+      icon="mdi-delete-outline"
       @close="dialog.delete = false"
       @confirm="batchDelete"
-    ></p-photo-delete-dialog>
+    ></p-confirm-dialog>
     <p-photo-album-dialog
       :visible="dialog.album"
       @close="dialog.album = false"
@@ -186,11 +189,14 @@ import $api from "common/api";
 import $notify from "common/notify";
 import download from "common/download";
 import Photo from "model/photo";
+
+import PConfirmDialog from "component/confirm/dialog.vue";
 import PPhotoAlbumDialog from "component/photo/album/dialog.vue";
 
 export default {
   name: "PPhotoClipboard",
   components: {
+    PConfirmDialog,
     PPhotoAlbumDialog,
   },
   props: {

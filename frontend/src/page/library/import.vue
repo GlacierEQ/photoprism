@@ -6,7 +6,8 @@
         <span v-else-if="busy">{{ $gettext(`Importing files to originals…`) }}</span>
         <span v-else-if="completed">{{ $gettext(`Done.`) }}</span>
         <span v-else-if="$config.filesQuotaReached()"
-          >{{ $gettext(`Your storage is full.`) }} {{ $gettext(`No new files can be added to your library.`) }}</span
+          >{{ $gettext(`Insufficient storage.`) }}
+          {{ $gettext(`Increase storage size or delete files to continue.`) }}</span
         >
         <span v-else>{{ $gettext(`Select a source folder to import files…`) }}</span>
       </div>
@@ -30,7 +31,9 @@
             @focus="onFocus"
           >
           </v-autocomplete>
-          <v-progress-linear :model-value="completed" :indeterminate="busy" :height="16"></v-progress-linear>
+          <v-progress-linear :model-value="completed" :indeterminate="busy" :height="16" color="selected">
+            <span v-if="eta" class="eta text-caption opacity-80">{{ eta }}</span>
+          </v-progress-linear>
         </div>
         <div class="form-options">
           <v-checkbox
@@ -116,6 +119,7 @@ export default {
       completed: 0,
       subscriptionId: "",
       fileName: "",
+      eta: "",
       source: null,
       root: root,
       dirs: [root],
@@ -214,7 +218,7 @@ export default {
             return;
           }
 
-          $notify.error(this.$gettext("Import failed"));
+          $notify.error(ctx.$gettext("Import failed"));
 
           ctx.busy = false;
           ctx.completed = 0;

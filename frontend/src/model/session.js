@@ -29,6 +29,8 @@ import memoizeOne from "memoize-one";
 import $util from "common/util";
 import { $gettext, T } from "common/gettext";
 
+export let BatchSize = 99999;
+
 export class Session extends RestModel {
   getDefaults() {
     return {
@@ -91,6 +93,10 @@ export class Session extends RestModel {
     }
 
     return this.AuthScope;
+  }
+
+  static batchSize() {
+    return BatchSize;
   }
 
   static getCollectionResource() {

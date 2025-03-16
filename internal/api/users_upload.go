@@ -36,7 +36,7 @@ func UploadUserFiles(router *gin.RouterGroup) {
 			return
 		}
 
-		// Check permission.
+		// Check if the account owner is allowed to upload files.
 		s := AuthAny(c, acl.ResourceFiles, acl.Permissions{acl.ActionManage, acl.ActionUpload})
 
 		if s.Abort(c) {
@@ -45,17 +45,17 @@ func UploadUserFiles(router *gin.RouterGroup) {
 
 		uid := clean.UID(c.Param("uid"))
 
-		// Users may only upload their own files.
+		// Users may only upload files for their own account.
 		if s.User().UserUID != uid {
 			event.AuditErr([]string{ClientIP(c), "session %s", "upload files", "user does not match"}, s.RefID)
 			AbortForbidden(c)
 			return
 		}
 
-		// Abort if the available storage is full.
-		if conf.FilesQuotaReached() {
-			event.AuditErr([]string{ClientIP(c), "session %s", "upload files", "quota has been reached"}, s.RefID)
-			Abort(c, http.StatusForbidden, i18n.ErrStorageIsFull)
+		// Abort if there is not enough free storage to upload new files.
+		if conf.FilesQuotaExceeded() {
+			event.AuditErr([]string{ClientIP(c), "session %s", "upload files", "insufficient storage"}, s.RefID)
+			Abort(c, http.StatusInsufficientStorage, i18n.ErrInsufficientStorage)
 			return
 		}
 

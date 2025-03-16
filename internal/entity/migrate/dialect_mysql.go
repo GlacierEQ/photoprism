@@ -207,4 +207,10 @@ var DialectMySQL = Migrations{
 		Stage:      "pre",
 		Statements: []string{"ALTER TABLE photos CHANGE COLUMN IF EXISTS photo_description photo_caption VARCHAR(4096);", "ALTER TABLE photos CHANGE COLUMN IF EXISTS description_src caption_src VARBINARY(8);"},
 	},
+	{
+		ID:         "20250315-000001",
+		Dialect:    "mysql",
+		Stage:      "pre",
+		Statements: []string{"ALTER TABLE auth_users_settings CHANGE COLUMN IF EXISTS default_page ui_start_page VARCHAR(64) DEFAULT 'default';"},
+	},
 }
