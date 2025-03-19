@@ -1,5 +1,6 @@
 {
   "configurations": [
+
     {
         "type": "firefox",
         "request": "launch",
