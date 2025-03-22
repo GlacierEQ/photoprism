@@ -12,7 +12,8 @@ async function main() {
   const command = args[0];
 
   if (!command) {
-    logger.error('No command specified');
+    logger.error('No command specified. Please provide a valid Docker command to execute.');
+
     console.log('Usage: node run-docker-command.js <command> [options]');
     console.log('Commands: build, up, down, logs, restart');
     process.exit(1);
@@ -20,7 +21,8 @@ async function main() {
 
   // Check if Docker is available
   if (!dockerWrapper.isDockerAvailable()) {
-    logger.error('Docker is not available. Please install Docker and try again.');
+    logger.error('Docker is not available. Please ensure Docker is installed and accessible from your command line.');
+
     process.exit(1);
   }
 
@@ -61,11 +63,13 @@ async function main() {
         break;
 
       default:
-        logger.error(`Unknown command: ${command}`);
+    logger.error(`Unknown command: ${command}. Please use one of the following commands: build, up, down, logs, restart.`);
+
         process.exit(1);
     }
   } catch (error) {
-    logger.error(`Command failed: ${error.message}`);
+    logger.error(`Command failed: ${error.message}. Please check the command and try again.`);
+
     process.exit(1);
   }
 }

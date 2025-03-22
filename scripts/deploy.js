@@ -283,14 +283,3 @@ class DeploymentManager {
       this.logger.info('For usage instructions, see USAGE-GUIDE.md');
       return true;
     } catch (error) {
-      this.logger.error(`Deployment process failed: ${error.message}`);
-      return false;
-    }
-  }
-}
-
-// Export the class for use in other modules
-module.exports = DeploymentManager;
-
-// If run directly, execute deployment
-if (require.main === module) {

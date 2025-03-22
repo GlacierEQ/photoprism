@@ -36,7 +36,8 @@ class DockerTroubleshooter {
       this.logger.info('✅ Docker is installed');
       return true;
     } catch (error) {
-      this.logger.error('❌ Docker is not installed or not in PATH');
+      this.logger.error('❌ Docker is not installed or not in PATH. Please ensure Docker is installed and added to your system PATH.');
+
       return false;
     }
   }
@@ -58,7 +59,8 @@ class DockerTroubleshooter {
         return true;
       }
     } catch (error) {
-      this.logger.error('❌ Docker Compose is not installed or not in PATH');
+      this.logger.error('❌ Docker Compose is not installed or not in PATH. Please install Docker Compose and ensure it is in your system PATH.');
+
       return false;
     }
   }
@@ -72,7 +74,8 @@ class DockerTroubleshooter {
       this.logger.info('✅ Docker daemon is running');
       return true;
     } catch (error) {
-      this.logger.error('❌ Docker daemon is not running');
+      this.logger.error('❌ Docker daemon is not running. Please start the Docker service and try again.');
+
       return false;
     }
   }
@@ -100,7 +103,8 @@ class DockerTroubleshooter {
     // Check if Docker Desktop is installed
     const isInstalled = fs.existsSync(dockerDesktopPath);
     if (!isInstalled) {
-      this.logger.warn('⚠️ Docker Desktop installation not found at expected location');
+      this.logger.warn('⚠️ Docker Desktop installation not found at expected location. Please ensure Docker Desktop is installed correctly.');
+
       return false;
     }
 
@@ -119,7 +123,8 @@ class DockerTroubleshooter {
         }
       }
 
-      this.logger.warn('⚠️ Docker Desktop is installed but not running');
+      this.logger.warn('⚠️ Docker Desktop is installed but not running. Please start Docker Desktop to continue.');
+
       return false;
     } catch (error) {
       this.logger.warn('⚠️ Unable to determine Docker Desktop running status');
@@ -130,37 +135,7 @@ class DockerTroubleshooter {
   /**
    * Suggest Docker Desktop startup (Windows)
    */
-  async startDockerDesktop() {
-    if (this.isWindows) {
-      try {
-        this.logger.info('Attempting to start Docker Desktop...');
-        const dockerPath = path.join(os.homedir(), 'AppData', 'Local', 'Docker', 'Docker', 'Docker Desktop.exe');
 
-        if (fs.existsSync(dockerPath)) {
-          spawn(dockerPath, [], {
-            detached: true,
-            stdio: 'ignore'
-          }).unref();
-
-          this.logger.info('Docker Desktop launch initiated. Please wait for it to start...');
-          this.logger.info('You may need to accept the Windows UAC prompt if it appears');
-          return true;
-        } else {
-          this.logger.warn('Docker Desktop executable not found at expected location');
-          return false;
-        }
-      } catch (error) {
-        this.logger.error(`Failed to start Docker Desktop: ${error.message}`);
-        return false;
-      }
-    } else if (this.isMac) {
-      this.logger.info('On macOS, please start Docker Desktop from the Applications folder');
-      return false;
-    } else {
-      this.logger.info('On Linux, please start Docker with: sudo systemctl start docker');
-      return false;
-    }
-  }
 
   /**
    * Provide installation instructions based on platform
@@ -248,7 +223,8 @@ class DockerTroubleshooter {
         this.logger.info('On Linux, you can start Docker with:');
         this.logger.info('sudo systemctl start docker');
       } else {
-        this.logger.info('Please ensure Docker Desktop is running before continuing.');
+      this.logger.info('Please ensure Docker Desktop is running before continuing. If it is not running, start Docker Desktop and wait a moment for it to initialize.');
+
       }
 
       return {

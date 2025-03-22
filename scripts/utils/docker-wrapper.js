@@ -10,6 +10,11 @@ class DockerWrapper {
     this.logger = logger.getLogger('docker-wrapper');
   }
 
+  logCommand(command) {
+    this.logger.debug(`Running Docker command: ${command}`);
+  }
+
+
   /**
    * Check if Docker is available
    * @returns {boolean} True if Docker is available
@@ -36,7 +41,10 @@ class DockerWrapper {
         stdio: 'pipe'
       });
     } catch (error) {
-      this.logger.error(`Docker command failed: ${error.message}`);
+      this.logger.error(`Docker command failed: ${error.message}. Please check the command and try again.`);
+      this.logger.error(`Command: docker ${args.join(' ')}`);
+
+
       throw error;
     }
   }
@@ -94,7 +102,8 @@ class DockerWrapper {
       });
 
       dockerProcess.on('error', (error) => {
-        this.logger.error(`Failed to execute Docker command: ${error.message}`);
+      this.logger.error(`Failed to execute Docker command: ${error.message}. Please ensure Docker is installed and accessible.`);
+
         reject(error);
       });
     });
