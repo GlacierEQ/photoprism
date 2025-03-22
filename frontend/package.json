@@ -39,7 +39,7 @@
     "babel-plugin-istanbul": "^7.0.0",
     "browserslist": "^4.24.4",
     "chai": "^5.1.2",
-    "cheerio": "1.0.0-rc.12",
+    "cheerio": "1.0.0",
     "chrome-finder": "^1.0.7",
     "core-js": "^3.40.0",
     "cross-env": "^7.0.3",
