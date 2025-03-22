@@ -262,7 +262,7 @@ services:
   ## ./photoprism client add --id=cs5cpu17n6gj2qo5 --secret=xcCbOrw6I0vcoXzhnOmXhjpVSyFq0l0e -s metrics -n Prometheus -e 60 -t 1
   prometheus:
     image: prom/prometheus:latest
-    profiles: ["all", "auth", "prometheus"]
+    profiles: [ "all", "auth", "prometheus" ]
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"

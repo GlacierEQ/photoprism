@@ -1,6 +1,7 @@
 # PhotoPrism Quick Deployment Guide
 
-If you're experiencing issues with the automated deployment scripts, you can use these direct commands to deploy PhotoPrism.
+If you're experiencing issues with the automated deployment scripts, you can use these direct commands to deploy
+PhotoPrism.
 
 ## Prerequisites
 

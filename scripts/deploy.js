@@ -5,6 +5,7 @@ const logger = require('./utils/logger');
 const DependencyVerifier = require('./verify-dependencies');
 const ProjectInitializer = require('./initialize');
 const PodmanTroubleshooter = require('./podman-troubleshoot');
+const dockerWrapper = require('./utils/docker-wrapper');
 
 /**
  * PhotoPrism Deployment Manager
@@ -283,3 +284,27 @@ class DeploymentManager {
       this.logger.info('For usage instructions, see USAGE-GUIDE.md');
       return true;
     } catch (error) {
+      this.logger.error(`Deployment process failed: ${error.message}`);
+      return false;
+    }
+  }
+}
+
+const deploy = async () => {
+  try {
+    const composeFile = path.join(__dirname, '..', 'docker', 'docker-compose.prod.yml');
+    const envFile = path.join(__dirname, '..', 'docker', '.env.prod');
+
+    await dockerWrapper.composeWithEnv('up', composeFile, envFile, ['-d']);
+    console.log('Deployment successful');
+  } catch (error) {
+    console.error('Deployment failed:', error.message);
+    process.exit(1);
+  }
+};
+
+if (require.main === module) {
+  deploy();
+}
+
+module.exports = deploy;
