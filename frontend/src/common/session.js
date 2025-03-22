@@ -351,11 +351,9 @@ export default class Session {
   getDefaultRoute() {
     if (this.loginRequired()) {
       return LoginPage;
-    } else if (this.config.allow("photos", "access_library")) {
-      return "browse";
-    } else {
-      return "albums";
     }
+
+    return this.config.getDefaultRoute();
   }
 
   isAdmin() {

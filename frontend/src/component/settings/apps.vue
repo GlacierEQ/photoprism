@@ -242,12 +242,12 @@
         </template>
       </v-card>
     </v-form>
-    <p-confirm-action
+    <p-confirm-dialog
       :visible="revoke.dialog"
       icon="mdi-delete-outline"
       @close="revoke.dialog = false"
       @confirm="onRevoked"
-    ></p-confirm-action>
+    ></p-confirm-dialog>
   </v-dialog>
 </template>
 <script>
@@ -256,12 +256,12 @@ import * as auth from "options/auth";
 import * as options from "options/options";
 import { DateTime } from "luxon";
 import memoizeOne from "memoize-one";
-import PConfirmAction from "component/confirm/action.vue";
+import PConfirmDialog from "component/confirm/dialog.vue";
 
 export default {
   name: "PSettingsApps",
   components: {
-    PConfirmAction,
+    PConfirmDialog,
   },
   props: {
     visible: {

@@ -4,42 +4,29 @@
       <v-toolbar density="compact" class="page-toolbar" color="secondary-light">
         <v-spacer></v-spacer>
 
-        <v-divider vertical></v-divider>
-
-        <v-btn
-          icon
-          variant="text"
-          color="surface-variant"
-          class="action-reload"
-          :title="$gettext('Reload')"
-          @click.stop="refresh"
-        >
-          <v-icon>mdi-refresh</v-icon>
-        </v-btn>
+        <v-btn :title="$gettext('Refresh')" icon="mdi-refresh" class="action-reload" @click.stop="refresh"> </v-btn>
 
         <v-btn
           v-if="!filter.hidden"
-          icon
-          class="action-show-hidden"
           :title="$gettext('Show hidden')"
+          icon="mdi-eye"
+          class="action-show-hidden"
           @click.stop="onShowHidden"
         >
-          <v-icon>mdi-eye</v-icon>
         </v-btn>
         <v-btn
           v-else
-          icon
-          class="action-exclude-hidden"
           :title="$gettext('Exclude hidden')"
+          icon="mdi-eye-off"
+          class="action-exclude-hidden"
           @click.stop="onExcludeHidden"
         >
-          <v-icon>mdi-eye-off</v-icon>
         </v-btn>
       </v-toolbar>
     </v-form>
 
-    <div v-if="loading" class="pa-6">
-      <v-progress-linear :indeterminate="true"></v-progress-linear>
+    <div v-if="loading" class="p-page__loading">
+      <p-loading></p-loading>
     </div>
     <div v-else class="p-page__content">
       <p-scroll
@@ -59,6 +46,11 @@
             {{ $gettext(`Recognition starts after indexing has been completed.`) }}
           </div>
         </v-alert>
+        <div class="d-flex justify-center my-8">
+          <v-btn color="secondary" rounded variant="flat" :to="{ name: 'all', query: { q: 'face:new' } }">
+            {{ $gettext(`Show all new faces`) }}
+          </v-btn>
+        </div>
       </div>
       <div v-else>
         <div class="v-row search-results face-results cards-view" :class="{ 'select-results': selection.length > 0 }">
@@ -127,14 +119,14 @@
         </div>
       </div>
     </div>
-    <p-confirm-action
+    <p-confirm-dialog
       :visible="confirm.visible"
       icon="mdi-account-plus"
       :icon-size="42"
       :text="confirm?.model?.Name ? $gettext('Add %{s}?', { s: confirm.model.Name }) : $gettext('Add person?')"
       @close="onCancelRename"
       @confirm="onConfirmRename"
-    ></p-confirm-action>
+    ></p-confirm-dialog>
   </div>
 </template>
 
@@ -144,12 +136,14 @@ import RestModel from "model/rest";
 import { MaxItems } from "common/clipboard";
 import $notify from "common/notify";
 import { ClickLong, ClickShort, Input, InputInvalid } from "common/input";
-import PConfirmAction from "component/confirm/action.vue";
+import PConfirmDialog from "component/confirm/dialog.vue";
+import PLoading from "component/loading.vue";
 
 export default {
   name: "PPageFaces",
   components: {
-    PConfirmAction,
+    PLoading,
+    PConfirmDialog,
   },
   props: {
     staticFilter: {

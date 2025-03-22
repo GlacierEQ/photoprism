@@ -34,6 +34,8 @@ import { Form } from "common/form";
 import RestModel from "model/rest";
 import memoizeOne from "memoize-one";
 
+export let BatchSize = 99999;
+
 export class User extends RestModel {
   getDefaults() {
     return {
@@ -347,6 +349,10 @@ export class User extends RestModel {
         params,
       })
       .then((response) => Promise.resolve(response.data));
+  }
+
+  static batchSize() {
+    return BatchSize;
   }
 
   static getCollectionResource() {

@@ -1,6 +1,8 @@
 package encode
 
-import "github.com/photoprism/photoprism/pkg/clean"
+import (
+	"github.com/photoprism/photoprism/pkg/clean"
+)
 
 // Encoder represents a supported FFmpeg AVC encoder name.
 type Encoder string

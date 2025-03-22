@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="visible" persistent max-width="350" class="p-dialog p-confirm-action" @keydown.esc="close">
+  <v-dialog :model-value="visible" persistent max-width="360" class="p-dialog p-confirm-dialog" @keydown.esc="close">
     <v-card>
       <v-card-title class="d-flex justify-start align-center ga-3">
         <v-icon :icon="icon" :size="iconSize" color="primary"></v-icon>
@@ -10,7 +10,7 @@
           {{ $gettext(`Cancel`) }}
         </v-btn>
         <v-btn color="highlight" variant="flat" class="action-confirm" @click.stop="confirm">
-          {{ $gettext(`Yes`) }}
+          {{ action ? action : $gettext(`Yes`) }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -18,7 +18,7 @@
 </template>
 <script>
 export default {
-  name: "PConfirmAction",
+  name: "PConfirmDialog",
   props: {
     visible: {
       type: Boolean,
@@ -33,6 +33,10 @@ export default {
       default: 54,
     },
     text: {
+      type: String,
+      default: "",
+    },
+    action: {
       type: String,
       default: "",
     },

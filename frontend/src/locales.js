@@ -31,6 +31,7 @@ export const Messages = ($gettext) => {
     },
     dataTable: {
       itemsPerPageText: $gettext("Rows per page:"),
+      itemsPerPageAll: $gettext("All"),
       ariaLabel: {
         sortDescending: $gettext("Sorted descending."),
         sortAscending: $gettext("Sorted ascending."),

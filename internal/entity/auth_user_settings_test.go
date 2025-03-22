@@ -78,6 +78,12 @@ func TestUserSettings_Apply(t *testing.T) {
 			Move: false,
 			Dest: customize.DefaultImportDest,
 		},
+		Search: customize.SearchSettings{
+			BatchSize:    -1,
+			ListView:     true,
+			ShowTitles:   false,
+			ShowCaptions: true,
+		},
 	}
 	r := m.Apply(s)
 
@@ -93,6 +99,9 @@ func TestUserSettings_Apply(t *testing.T) {
 	assert.Equal(t, "index-path", r.IndexPath)
 	assert.Equal(t, -1, r.ImportMove)
 	assert.Equal(t, "imports/2023", r.ImportPath)
+	assert.Equal(t, 1, r.SearchListView)
+	assert.Equal(t, -1, r.SearchShowTitles)
+	assert.Equal(t, 1, r.SearchShowCaptions)
 
 	s2 := &customize.Settings{
 		Download: customize.DownloadSettings{

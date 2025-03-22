@@ -32,7 +32,7 @@
         </v-btn>
         <v-btn
           v-if="isPublic || !isAdmin"
-          href="https://link.photoprism.app/personal-editions"
+          :href="links.compare"
           target="_blank"
           variant="flat"
           color="highlight"
@@ -48,6 +48,8 @@
   </v-dialog>
 </template>
 <script>
+import links from "common/links";
+
 export default {
   name: "PDialogSponsor",
   props: {
@@ -58,6 +60,7 @@ export default {
   },
   data() {
     return {
+      links,
       isPublic: this.$config.isPublic(),
       isAdmin: this.$session.isAdmin(),
       isDemo: this.$config.isDemo(),

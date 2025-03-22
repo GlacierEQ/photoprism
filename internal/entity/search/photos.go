@@ -175,7 +175,7 @@ func searchPhotos(frm form.SearchPhotos, sess *entity.Session, resultCols string
 	switch frm.Order {
 	case sortby.Edited:
 		s = s.Where("photos.edited_at IS NOT NULL").Order("photos.edited_at DESC, files.media_id")
-	case sortby.Updated:
+	case sortby.Updated, sortby.UpdatedAt:
 		s = s.Where("photos.updated_at > photos.created_at").Order("photos.updated_at DESC, files.media_id")
 	case sortby.Archived:
 		s = s.Order("photos.deleted_at DESC, files.media_id")
@@ -322,6 +322,12 @@ func searchPhotos(frm form.SearchPhotos, sess *entity.Session, resultCols string
 		case terms["video"]:
 			frm.Query = strings.ReplaceAll(frm.Query, "video", "")
 			frm.Video = true
+		case terms["documents"]:
+			frm.Query = strings.ReplaceAll(frm.Query, "documents", "")
+			frm.Document = true
+		case terms["document"]:
+			frm.Query = strings.ReplaceAll(frm.Query, "document", "")
+			frm.Document = true
 		case terms["vectors"]:
 			frm.Query = strings.ReplaceAll(frm.Query, "vectors", "")
 			frm.Vector = true
@@ -555,9 +561,14 @@ func searchPhotos(frm form.SearchPhotos, sess *entity.Session, resultCols string
 		s = s.Where("files.file_aspect_ratio = 1")
 	}
 
-	// Filter by main color.
-	if frm.Color != "" {
+	// Filter by file main color.
+	if txt.NotEmpty(frm.Color) {
 		s = s.Where("files.file_main_color IN (?)", SplitOr(strings.ToLower(frm.Color)))
+	}
+
+	// Filter by file codec.
+	if txt.NotEmpty(frm.Codec) {
+		s = s.Where("files.file_codec IN (?)", SplitOr(strings.ToLower(frm.Codec)))
 	}
 
 	// Filter by chroma.
@@ -635,7 +646,7 @@ func searchPhotos(frm form.SearchPhotos, sess *entity.Session, resultCols string
 	} else if frm.Video {
 		s = s.Where("photos.photo_type = ?", media.Video)
 	} else if frm.Photo {
-		s = s.Where("photos.photo_type IN ('image','live','animated','vector','raw')")
+		s = s.Where("photos.photo_type IN ('image','raw','live','animated','vector')")
 	}
 
 	// Filter by storage path.
@@ -684,7 +695,7 @@ func searchPhotos(frm form.SearchPhotos, sess *entity.Session, resultCols string
 		s = s.Where(where, values...)
 	}
 
-	// Filter by hash.
+	// Filter by file hash.
 	if txt.NotEmpty(frm.Hash) {
 		s = s.Where("files.file_hash IN (?)", SplitOr(strings.ToLower(frm.Hash)))
 	}

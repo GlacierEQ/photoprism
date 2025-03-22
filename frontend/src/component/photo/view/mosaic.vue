@@ -2,7 +2,7 @@
   <div class="p-photos p-photo-view-mosaic">
     <div v-if="photos.length === 0" class="pa-3">
       <v-alert
-        color="primary"
+        color="surface-variant"
         :icon="isSharedView ? 'mdi-image-off' : 'mdi-lightbulb-outline'"
         class="no-results"
         variant="outlined"
@@ -55,7 +55,7 @@
             v-else
             :data-id="m.ID"
             :data-uid="m.UID"
-            :title="m.Title"
+            :title="showTitles && m.Title ? m.Title : m.getOriginalName()"
             :style="`background-image: url(${m.thumbnailUrl('tile_224')})`"
             :class="m.classes()"
             class="media result preview"
@@ -90,6 +90,11 @@
                 class="action-vector mdi mdi-vector-polyline"
                 :title="$gettext('Vector')"
               ></i>
+              <i
+                v-else-if="m.Type === 'document'"
+                class="action-document mdi mdi-file-pdf-box"
+                :title="$gettext('Document')"
+              />
               <i
                 v-else-if="m.Type === 'image' && !selectMode"
                 class="mdi mdi-camera-burst"
@@ -189,11 +194,16 @@ export default {
     const input = new Input();
     const debug = this.$config.get("debug");
     const trace = this.$config.get("trace");
+    const settings = this.$config.getSettings();
+    const showTitles = settings.search.showTitles;
+    const showCaptions = settings.search.showCaptions;
 
     return {
       input,
       debug,
       trace,
+      showTitles,
+      showCaptions,
       hidePrivate: this.$config.getSettings().features.private,
       firstVisibleElementIndex: 0,
       lastVisibleElementIndex: 0,

@@ -137,6 +137,11 @@ export default {
     flat: true,
     transition: false,
   },
+  VSnackbar: {
+    rounded: "pill",
+    location: "bottom",
+    transition: "fade-transition",
+  },
   VNavigationDrawer: {
     width: 270,
     railWidth: 70,

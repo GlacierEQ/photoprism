@@ -17,8 +17,8 @@
       class="p-page__navigation"
     ></p-album-toolbar>
 
-    <div v-if="loading" class="pa-6">
-      <v-progress-linear :indeterminate="true"></v-progress-linear>
+    <div v-if="loading" class="p-page__loading">
+      <p-loading></p-loading>
     </div>
     <div v-else class="p-page__content">
       <p-scroll
@@ -82,10 +82,12 @@ import PPhotoViewCards from "component/photo/view/cards.vue";
 import PPhotoViewMosaic from "component/photo/view/mosaic.vue";
 import PPhotoViewList from "component/photo/view/list.vue";
 import PScroll from "component/scroll.vue";
+import PLoading from "component/loading.vue";
 
 export default {
   name: "PPageAlbumPhotos",
   components: {
+    PLoading,
     PAlbumToolbar,
     PPhotoClipboard,
     PPhotoViewCards,

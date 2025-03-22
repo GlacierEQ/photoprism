@@ -172,20 +172,6 @@
                               }}</span>
                             </td>
                           </tr>
-                          <tr>
-                            <td>
-                              {{ $gettext(`Size`) }}
-                            </td>
-                            <td>
-                              <span v-tooltip="Math.ceil(file?.Size / 1024).toLocaleString() + ' KB'">{{ file.sizeInfo() }}</span>
-                            </td>
-                          </tr>
-                          <tr v-if="file.Software">
-                            <td>
-                              {{ $gettext(`Software`) }}
-                            </td>
-                            <td class="text-break">{{ file.Software }}</td>
-                          </tr>
                           <tr v-if="file.FileType">
                             <td>
                               {{ $gettext(`Type`) }}
@@ -193,6 +179,28 @@
                             <td class="text-break">
                               <span v-tooltip="file?.Mime">{{ file.typeInfo() }}</span>
                             </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              {{ $gettext(`Size`) }}
+                            </td>
+                            <td>
+                              <span v-tooltip="Math.ceil(file?.Size / 1024).toLocaleString() + ' KB'">{{
+                                file.sizeInfo()
+                              }}</span>
+                            </td>
+                          </tr>
+                          <tr v-if="file.Pages">
+                            <td>
+                              {{ $gettext(`Pages`) }}
+                            </td>
+                            <td>{{ file.Pages }}</td>
+                          </tr>
+                          <tr v-if="file.Software">
+                            <td>
+                              {{ $gettext(`Software`) }}
+                            </td>
+                            <td class="text-break">{{ file.Software }}</td>
                           </tr>
                           <tr v-if="file.isAnimated()">
                             <td>
@@ -325,6 +333,7 @@
                               <v-progress-linear
                                 v-tooltip="`${file.Chroma}%`"
                                 :model-value="file.Chroma"
+                                color="surface-variant"
                                 style="max-width: 300px"
                               ></v-progress-linear>
                             </td>

@@ -54,7 +54,7 @@ func MimeType(filename string) (mimeType string) {
 	case VectorEPS:
 		return header.ContentTypeEPS
 	// Adobe PDF
-	case VectorPDF:
+	case DocumentPDF:
 		return header.ContentTypePDF
 	// Scalable Vector Graphics
 	case VectorSVG:

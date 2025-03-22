@@ -62,8 +62,12 @@ func Sessions(frm form.SearchSessions) (result entity.Sessions, err error) {
 		stmt = stmt.Order("sess_expires DESC, user_name, client_name, id")
 	case sortby.ClientName:
 		stmt = stmt.Where("client_name <> '' AND client_name IS NOT NULL").Order("client_name, created_at, id")
-	case sortby.CreatedAt:
+	case sortby.Login, sortby.LoginAt:
+		stmt = stmt.Order("login_at DESC, user_name, client_name, id")
+	case sortby.Created, sortby.CreatedAt:
 		stmt = stmt.Order("created_at ASC, user_name, client_name, id")
+	case sortby.Updated, sortby.UpdatedAt:
+		stmt = stmt.Order("updated_at DESC, user_name, client_name, id")
 	default:
 		return result, fmt.Errorf("invalid sort order %s", order)
 	}

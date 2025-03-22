@@ -1,13 +1,18 @@
 <template>
   <div class="p-page p-page-help" tabindex="1">
-    <v-toolbar flat color="secondary" :density="$vuetify.display.smAndDown ? 'compact' : 'default'" class="p-page__navigation">
+    <v-toolbar
+      flat
+      color="secondary"
+      :density="$vuetify.display.smAndDown ? 'compact' : 'default'"
+      class="p-page__navigation"
+    >
       <v-toolbar-title class="flex-grow-1">
         {{ $gettext(`Help`) }}
       </v-toolbar-title>
 
       <v-btn
         icon
-        href="https://docs.photoprism.app/getting-started/troubleshooting/"
+        :href="links.troubleshooting"
         target="_blank"
         class="action-info mx-2"
         :title="$gettext('Learn more')"
@@ -25,6 +30,8 @@
 </template>
 
 <script>
+import links from "common/links";
+
 import PHelpWebsockets from "./help/websockets.vue";
 import PAboutFooter from "component/about/footer.vue";
 
@@ -36,6 +43,7 @@ export default {
   },
   data() {
     return {
+      links,
       topic: this.$route.params.pathMatch,
     };
   },

@@ -34,7 +34,7 @@
           autocorrect="off"
           autocapitalize="none"
           color="surface-variant"
-          class="input-search background-inherit elevation-0"
+          class="input-search input-search--focus background-inherit elevation-0"
           @update:model-value="
             (v) => {
               updateFilter({ q: v });
@@ -48,21 +48,28 @@
           "
         ></v-text-field>
 
-        <v-btn icon class="action-reload" :title="$gettext('Reload')" @click.stop="refresh()">
-          <v-icon>mdi-refresh</v-icon>
+        <v-btn
+          v-if="!filter.all"
+          icon="mdi-eye"
+          :title="$gettext('Show more')"
+          class="action-show-all ms-1"
+          @click.stop="showAll"
+        >
         </v-btn>
-
-        <v-btn v-if="!filter.all" icon class="action-show-all" :title="$gettext('Show more')" @click.stop="showAll()">
-          <v-icon>mdi-unfold-more-horizontal</v-icon>
+        <v-btn
+          v-else
+          icon="mdi-eye-off"
+          :title="$gettext('Show less')"
+          class="action-show-important ms-1"
+          @click.stop="showImportant"
+        >
         </v-btn>
-        <v-btn v-else icon class="action-show-important" :title="$gettext('Show less')" @click.stop="showImportant()">
-          <v-icon>mdi-unfold-less-horizontal</v-icon>
-        </v-btn>
+        <p-action-menu v-if="$vuetify.display.mdAndUp" :items="menuActions" button-class="ms-1"></p-action-menu>
       </v-toolbar>
     </v-form>
 
-    <div v-if="loading" class="pa-6">
-      <v-progress-linear :indeterminate="true"></v-progress-linear>
+    <div v-if="loading" class="p-page__loading">
+      <p-loading></p-loading>
     </div>
     <div v-else class="p-page__content">
       <p-label-clipboard
@@ -80,7 +87,7 @@
       ></p-scroll>
 
       <div v-if="results.length === 0" class="pa-3">
-        <v-alert color="primary" icon="mdi-lightbulb-outline" class="no-results" variant="outlined">
+        <v-alert color="surface-variant" icon="mdi-lightbulb-outline" class="no-results" variant="outlined">
           <div class="font-weight-bold">
             {{ $gettext(`No labels found`) }}
           </div>
@@ -176,8 +183,15 @@ import { MaxItems } from "common/clipboard";
 import $notify from "common/notify";
 import { Input, InputInvalid, ClickShort, ClickLong } from "common/input";
 
+import PLoading from "component/loading.vue";
+import PActionMenu from "component/action/menu.vue";
+
 export default {
   name: "PPageLabels",
+  components: {
+    PLoading,
+    PActionMenu,
+  },
   props: {
     staticFilter: {
       type: Object,
@@ -266,6 +280,27 @@ export default {
     this.$view.leave(this);
   },
   methods: {
+    menuActions() {
+      return [
+        {
+          name: "refresh",
+          icon: "mdi-refresh",
+          text: this.$gettext("Refresh"),
+          visible: true,
+          click: () => {
+            this.refresh();
+          },
+        },
+        {
+          name: "docs",
+          icon: "mdi-book-open-page-variant-outline",
+          text: this.$gettext("Learn More"),
+          visible: true,
+          href: "https://docs.photoprism.app/user-guide/organize/labels/",
+          target: "_blank",
+        },
+      ];
+    },
     onCtrl(ev) {
       if (!ev || !(ev instanceof KeyboardEvent) || !ev.ctrlKey || !this.$view.isActive(this)) {
         return;

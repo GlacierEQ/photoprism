@@ -23,13 +23,13 @@ Additional information can be found in our Developer Guide:
 
 */
 
+import RestModel from "model/rest";
 import * as auth from "options/auth";
-
+import memoizeOne from "memoize-one";
+import $util from "common/util";
 import { $gettext, T } from "common/gettext";
 
-import $util from "common/util";
-import RestModel from "model/rest";
-import memoizeOne from "memoize-one";
+export let BatchSize = 99999;
 
 export class Session extends RestModel {
   getDefaults() {
@@ -74,7 +74,7 @@ export class Session extends RestModel {
       providerName = $util.capitalize(this.AuthProvider);
     }
 
-    if (!this.AuthMethod || this.AuthMethod === "default") {
+    if (!this.AuthMethod || this.AuthMethod === "" || this.AuthMethod === "default") {
       return providerName;
     }
 
@@ -93,6 +93,10 @@ export class Session extends RestModel {
     }
 
     return this.AuthScope;
+  }
+
+  static batchSize() {
+    return BatchSize;
   }
 
   static getCollectionResource() {

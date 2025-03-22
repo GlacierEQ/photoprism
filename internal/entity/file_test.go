@@ -776,6 +776,26 @@ func TestFile_SetFrames(t *testing.T) {
 	})
 }
 
+func TestFile_SetPages(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		m := File{FilePages: 4}
+
+		assert.Equal(t, 4, m.FilePages)
+
+		m.SetPages(120)
+
+		assert.Equal(t, 120, m.FilePages)
+
+		m.SetPages(30)
+
+		assert.Equal(t, 30, m.FilePages)
+
+		m.SetPages(0)
+
+		assert.Equal(t, 30, m.FilePages)
+	})
+}
+
 func TestFile_SetDuration(t *testing.T) {
 	t.Run("FileFPS", func(t *testing.T) {
 		m := File{FileFPS: 20}

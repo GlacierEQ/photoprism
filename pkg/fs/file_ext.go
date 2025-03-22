@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	ExtPDF    = ".pdf"
 	ExtJpeg   = ".jpg"
 	ExtPng    = ".png"
 	ExtDng    = ".dng"

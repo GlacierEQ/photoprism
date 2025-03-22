@@ -131,7 +131,7 @@
                 color="surface-variant"
                 :label="$gettext('Disable ExifTool')"
                 :hint="$gettext('ExifTool is required for full support of XMP metadata, videos and Live Photos.')"
-                prepend-icon="mdi-camera-off"
+                prepend-icon="mdi-movie-off-outline"
                 persistent-hint
                 @update:model-value="onChange"
               >

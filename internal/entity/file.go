@@ -66,6 +66,7 @@ type File struct {
 	FileDuration       time.Duration `json:"Duration" yaml:"Duration,omitempty"`
 	FileFPS            float64       `gorm:"column:file_fps;" json:"FPS" yaml:"FPS,omitempty"`
 	FileFrames         int           `gorm:"column:file_frames;" json:"Frames" yaml:"Frames,omitempty"`
+	FilePages          int           `gorm:"column:file_pages;default:0;" json:"Pages" yaml:"Pages,omitempty"`
 	FileWidth          int           `gorm:"column:file_width;" json:"Width" yaml:"Width,omitempty"`
 	FileHeight         int           `gorm:"column:file_height;" json:"Height" yaml:"Height,omitempty"`
 	FileOrientation    int           `gorm:"column:file_orientation;" json:"Orientation" yaml:"Orientation,omitempty"`
@@ -757,6 +758,15 @@ func (m *File) SetFrames(n int) {
 		m.FileFPS = 30.0 // Assume 30 frames per second.
 		m.FileDuration = time.Duration(float64(m.FileFrames)/m.FileFPS) * time.Second
 	}
+}
+
+// SetPages sets the number of document pages.
+func (m *File) SetPages(n int) {
+	if n <= 0 {
+		return
+	}
+
+	m.FilePages = n
 }
 
 // SetMediaUTC sets the media creation date from metadata as unix time in ms.

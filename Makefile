@@ -386,6 +386,9 @@ docker-pull:
 docker-build:
 	$(DOCKER_COMPOSE) --profile=all pull --ignore-pull-failures
 	$(DOCKER_COMPOSE) build --pull
+docker-nvidia: docker-nvidia-up
+docker-nvidia-up:
+	docker compose -f compose.nvidia.yaml up
 docker-local-up:
 	$(DOCKER_COMPOSE) -f compose.local.yaml up --force-recreate
 docker-local-down:

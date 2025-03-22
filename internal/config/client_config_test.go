@@ -16,7 +16,7 @@ func TestConfig_ClientConfig(t *testing.T) {
 		result := c.ClientPublic()
 		assert.IsType(t, &ClientConfig{}, result)
 		assert.Equal(t, AuthModePublic, result.AuthMode)
-		assert.Equal(t, c.LibraryUri("/browse"), result.LoginUri)
+		assert.Equal(t, c.LibraryUri("/"), result.LoginUri)
 		assert.Equal(t, "", result.RegisterUri)
 		assert.Equal(t, 0, result.PasswordLength)
 		assert.Equal(t, "", result.PasswordResetUri)
@@ -142,6 +142,7 @@ func TestConfig_ClientRoleConfig(t *testing.T) {
 			Labels:    true,
 			Library:   true,
 			Logs:      true,
+			Calendar:  true,
 			Moments:   true,
 			People:    true,
 			Places:    true,
@@ -180,6 +181,7 @@ func TestConfig_ClientRoleConfig(t *testing.T) {
 			Labels:    false,
 			Library:   false,
 			Logs:      false,
+			Calendar:  true,
 			Moments:   true,
 			People:    false,
 			Places:    true,
@@ -218,6 +220,7 @@ func TestConfig_ClientRoleConfig(t *testing.T) {
 			Labels:    false,
 			Library:   false,
 			Logs:      false,
+			Calendar:  true,
 			Moments:   true,
 			People:    false,
 			Places:    true,
@@ -243,6 +246,7 @@ func TestConfig_ClientRoleConfig(t *testing.T) {
 		assert.False(t, f.Search)
 		assert.False(t, f.Videos)
 		assert.False(t, f.Albums)
+		assert.False(t, f.Calendar)
 		assert.False(t, f.Moments)
 		assert.False(t, f.Labels)
 		assert.False(t, f.People)
@@ -285,6 +289,7 @@ func TestConfig_ClientSessionConfig(t *testing.T) {
 		assert.True(t, f.Search)
 		assert.True(t, f.Videos)
 		assert.True(t, f.Albums)
+		assert.True(t, f.Calendar)
 		assert.True(t, f.Moments)
 		assert.True(t, f.Labels)
 		assert.True(t, f.People)
@@ -315,6 +320,7 @@ func TestConfig_ClientSessionConfig(t *testing.T) {
 		assert.True(t, f.Search)
 		assert.True(t, f.Videos)
 		assert.True(t, f.Albums)
+		assert.True(t, f.Calendar)
 		assert.True(t, f.Moments)
 		assert.True(t, f.Labels)
 		assert.True(t, f.People)
@@ -375,6 +381,7 @@ func TestConfig_ClientSessionConfig(t *testing.T) {
 		assert.False(t, f.Search)
 		assert.False(t, f.Videos)
 		assert.True(t, f.Albums)
+		assert.True(t, f.Calendar)
 		assert.True(t, f.Moments)
 		assert.True(t, f.Folders)
 		assert.False(t, f.Labels)
@@ -406,6 +413,7 @@ func TestConfig_ClientSessionConfig(t *testing.T) {
 		assert.False(t, f.Search)
 		assert.False(t, f.Videos)
 		assert.True(t, f.Albums)
+		assert.True(t, f.Calendar)
 		assert.True(t, f.Moments)
 		assert.True(t, f.Folders)
 		assert.False(t, f.Labels)
@@ -467,6 +475,7 @@ func TestConfig_ClientSessionConfig(t *testing.T) {
 		assert.True(t, f.Search)
 		assert.True(t, f.Videos)
 		assert.True(t, f.Albums)
+		assert.True(t, f.Calendar)
 		assert.True(t, f.Moments)
 		assert.True(t, f.Labels)
 		assert.True(t, f.People)
@@ -528,6 +537,7 @@ func TestConfig_ClientSessionConfig(t *testing.T) {
 		assert.True(t, f.Search)
 		assert.True(t, f.Videos)
 		assert.True(t, f.Albums)
+		assert.True(t, f.Calendar)
 		assert.True(t, f.Moments)
 		assert.True(t, f.Labels)
 		assert.True(t, f.People)

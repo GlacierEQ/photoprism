@@ -15,6 +15,30 @@
     box-shadow: 0 2px 1px -1px var(--v-shadow-key-umbra-opacity, #0003), 0 1px 1px 0 var(--v-shadow-key-penumbra-opacity, #00000024), 0 1px 3px 0 var(--v-shadow-key-ambient-opacity, #0000001f) !important;
 }
 
+.v-main > .p-page .p-page__loading {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    padding: 30vh 24px;
+}
+
+.p-page .v-toolbar-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.75rem;
+    letter-spacing: normal;
+    vertical-align: baseline;
+}
+
+.p-page .v-toolbar-title .v-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
 .p-page-about {
     line-height: 1.5rem;
 }

@@ -18,7 +18,7 @@
           autocapitalize="none"
           color="surface-variant"
           density="compact"
-          class="input-search background-inherit elevation-0"
+          class="input-search input-search--focus background-inherit elevation-0"
           @update:model-value="
             (v) => {
               updateFilter({ q: v });
@@ -32,44 +32,31 @@
           "
         ></v-text-field>
 
-        <v-divider vertical></v-divider>
-
-        <v-btn
-          icon
-          variant="text"
-          color="surface-variant"
-          class="action-reload"
-          :title="$gettext('Reload')"
-          @click.stop="refresh()"
-        >
-          <v-icon>mdi-refresh</v-icon>
-        </v-btn>
+        <v-btn :title="$gettext('Refresh')" icon="mdi-refresh" class="action-reload" @click.stop="refresh"></v-btn>
 
         <template v-if="canManage">
           <v-btn
             v-if="!filter.hidden"
-            icon
-            class="action-show-hidden"
             :title="$gettext('Show hidden')"
-            @click.stop="onShowHidden()"
+            icon="mdi-eye"
+            class="action-show-hidden"
+            @click.stop="onShowHidden"
           >
-            <v-icon>mdi-eye</v-icon>
           </v-btn>
           <v-btn
             v-else
-            icon
-            class="action-exclude-hidden"
             :title="$gettext('Exclude hidden')"
+            icon="mdi-eye-off"
+            class="action-exclude-hidden"
             @click.stop="onExcludeHidden()"
           >
-            <v-icon>mdi-eye-off</v-icon>
           </v-btn>
         </template>
       </v-toolbar>
     </v-form>
 
-    <div v-if="loading" class="pa-6">
-      <v-progress-linear :indeterminate="true"></v-progress-linear>
+    <div v-if="loading" class="p-page__loading">
+      <p-loading></p-loading>
     </div>
     <div v-else style="min-height: 100vh" class="p-page__content">
       <p-people-clipboard
@@ -86,7 +73,7 @@
       ></p-scroll>
 
       <div v-if="results.length === 0" class="pa-3">
-        <v-alert color="primary" icon="mdi-lightbulb-outline" class="no-results" variant="outlined">
+        <v-alert color="surface-variant" icon="mdi-lightbulb-outline" class="no-results" variant="outlined">
           <div class="font-weight-bold">
             {{ $gettext(`No people found`) }}
           </div>
@@ -212,9 +199,11 @@ import RestModel from "model/rest";
 import { MaxItems } from "common/clipboard";
 import $notify from "common/notify";
 import { ClickLong, ClickShort, Input, InputInvalid } from "common/input";
+import PLoading from "component/loading.vue";
 
 export default {
   name: "PPageSubjects",
+  components: { PLoading },
   props: {
     staticFilter: {
       type: Object,

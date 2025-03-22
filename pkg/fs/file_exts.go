@@ -10,7 +10,8 @@ type FileExtensions map[string]Type
 
 // Extensions contains the filename extensions of file formats known to PhotoPrism.
 var Extensions = FileExtensions{
-	ExtJpeg:     ImageJpeg, // .jpg
+	ExtPDF:      DocumentPDF, // .pdf
+	ExtJpeg:     ImageJpeg,   // .jpg
 	".jpeg":     ImageJpeg,
 	".jpe":      ImageJpeg,
 	".jif":      ImageJpeg,
@@ -80,6 +81,28 @@ var Extensions = FileExtensions{
 	".srw":      ImageRaw,
 	".sr2":      ImageRaw,
 	".x3f":      ImageRaw,
+	ExtXMP:      SidecarXMP,
+	".aae":      SidecarAppleXml,
+	ExtXml:      SidecarXml,
+	ExtYaml:     SidecarYaml, // .yml
+	".yaml":     SidecarYaml,
+	ExtJson:     SidecarJson,
+	ExtTxt:      SidecarText,
+	".nfo":      SidecarInfo,
+	ExtMd:       SidecarMarkdown,
+	".markdown": SidecarMarkdown,
+	".svg":      VectorSVG,
+	".ai":       VectorAI,
+	".ps":       VectorPS,
+	".ps2":      VectorPS,
+	".ps3":      VectorPS,
+	".eps":      VectorEPS,
+	".eps2":     VectorEPS,
+	".eps3":     VectorEPS,
+	".epi":      VectorEPS,
+	".ept":      VectorEPS,
+	".epsf":     VectorEPS,
+	".epsi":     VectorEPS,
 	ExtMov:      VideoMov, // Apple QuickTime Video Container
 	ExtQT:       VideoMov, //  .qt
 	ExtMp4:      VideoMp4, // MPEG-4 Part 14 Multimedia Container
@@ -141,28 +164,6 @@ var Extensions = FileExtensions{
 	".avi":      VideoAVI,
 	".wmv":      VideoWMV,
 	".dv":       VideoDV,
-	".svg":      VectorSVG,
-	".ai":       VectorAI,
-	".ps":       VectorPS,
-	".ps2":      VectorPS,
-	".ps3":      VectorPS,
-	".eps":      VectorEPS,
-	".eps2":     VectorEPS,
-	".eps3":     VectorEPS,
-	".epi":      VectorEPS,
-	".ept":      VectorEPS,
-	".epsf":     VectorEPS,
-	".epsi":     VectorEPS,
-	ExtXMP:      SidecarXMP,
-	".aae":      SidecarAppleXml,
-	ExtXml:      SidecarXml,
-	ExtYaml:     SidecarYaml, // .yml
-	".yaml":     SidecarYaml,
-	ExtJson:     SidecarJson,
-	ExtTxt:      SidecarText,
-	".nfo":      SidecarInfo,
-	ExtMd:       SidecarMarkdown,
-	".markdown": SidecarMarkdown,
 }
 
 // Known tests if the file extension is known (supported).

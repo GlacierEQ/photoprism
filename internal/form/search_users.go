@@ -2,13 +2,14 @@ package form
 
 // SearchUsers represents a user search form.
 type SearchUsers struct {
-	User   string `form:"user"`
-	Query  string `form:"q"`
-	Name   string `form:"name"`
-	Email  string `form:"email"`
-	Count  int    `form:"count" binding:"required" serialize:"-"`
-	Offset int    `form:"offset" serialize:"-"`
-	Order  string `form:"order" serialize:"-"`
+	Query   string `form:"q"`
+	User    string `form:"user"`
+	Name    string `form:"name"`
+	Email   string `form:"email"`
+	Deleted bool   `form:"deleted"`
+	Order   string `form:"order" serialize:"-"`
+	Count   int    `form:"count" binding:"required" serialize:"-"`
+	Offset  int    `form:"offset" serialize:"-"`
 }
 
 func (f *SearchUsers) GetQuery() string {

@@ -20,7 +20,7 @@
 
 <script>
 import General from "page/settings/general.vue";
-import Library from "page/settings/library.vue";
+import Content from "page/settings/content.vue";
 import Advanced from "page/settings/advanced.vue";
 import Services from "page/settings/services.vue";
 import Account from "page/settings/account.vue";
@@ -65,16 +65,16 @@ export default {
         show: $config.feature("settings"),
       },
       {
-        name: "settings_media",
-        component: markRaw(Library),
-        label: this.$gettext("Library"),
+        name: "settings_content",
+        component: markRaw(Content),
+        label: this.$gettext("Content"),
         class: "",
-        path: "/settings/media",
-        icon: "mdi-film",
+        path: "/settings/content",
+        icon: "mdi-camera-iris",
         public: true,
         admin: true,
         demo: true,
-        show: $config.allow("config", "manage") && isSuperAdmin,
+        show: $config.feature("settings"),
       },
       {
         name: "settings_advanced",
@@ -86,7 +86,7 @@ export default {
         public: false,
         admin: true,
         demo: true,
-        show: $config.allow("config", "manage"),
+        show: $config.allow("config", "manage") && isSuperAdmin,
       },
       {
         name: "settings_services",

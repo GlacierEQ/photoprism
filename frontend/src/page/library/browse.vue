@@ -1,6 +1,11 @@
 <template>
   <div ref="page" tabindex="1" class="p-page p-page-files">
-    <v-form ref="form" validate-on="invalid-input" class="p-files-search p-page__navigation" @submit.prevent="updateQuery">
+    <v-form
+      ref="form"
+      validate-on="invalid-input"
+      class="p-files-search p-page__navigation"
+      @submit.prevent="updateQuery"
+    >
       <v-toolbar flat color="secondary" :density="$vuetify.display.smAndDown ? 'compact' : 'default'">
         <v-toolbar-title>
           <router-link to="/index/files">
@@ -13,14 +18,12 @@
           </router-link>
         </v-toolbar-title>
 
-        <v-btn icon :title="$gettext('Reload')" class="action-reload" @click.stop="refresh">
-          <v-icon>mdi-refresh</v-icon>
-        </v-btn>
+        <v-btn :title="$gettext('Refresh')" icon="mdi-refresh" class="action-reload" @click.stop="refresh"> </v-btn>
       </v-toolbar>
     </v-form>
 
-    <div v-if="loading" class="pa-6">
-      <v-progress-linear :indeterminate="true"></v-progress-linear>
+    <div v-if="loading" class="p-page__loading">
+      <p-loading></p-loading>
     </div>
     <div v-else class="p-page__content">
       <p-file-clipboard :refresh="refresh" :selection="selection" :clear-selection="clearSelection"></p-file-clipboard>
@@ -30,7 +33,7 @@
       <div class="p-files p-files-cards">
         <v-alert
           v-if="results.length === 0"
-          color="primary"
+          color="surface-variant"
           icon="mdi-lightbulb-outline"
           class="ma-3 no-results opacity-60"
           variant="outlined"
@@ -113,9 +116,11 @@ import $notify from "common/notify";
 import { MaxItems } from "common/clipboard";
 import download from "common/download";
 import { Input, InputInvalid, ClickShort, ClickLong } from "common/input";
+import PLoading from "component/loading.vue";
 
 export default {
   name: "PPageFiles",
+  components: { PLoading },
   props: {
     staticFilter: {
       type: Object,

@@ -250,6 +250,12 @@ func UserPhotosGeo(frm form.SearchPhotosGeo, sess *entity.Session) (results GeoR
 		case terms["video"]:
 			frm.Query = strings.ReplaceAll(frm.Query, "video", "")
 			frm.Video = true
+		case terms["documents"]:
+			frm.Query = strings.ReplaceAll(frm.Query, "documents", "")
+			frm.Document = true
+		case terms["document"]:
+			frm.Query = strings.ReplaceAll(frm.Query, "document", "")
+			frm.Document = true
 		case terms["vectors"]:
 			frm.Query = strings.ReplaceAll(frm.Query, "vectors", "")
 			frm.Vector = true
@@ -461,9 +467,14 @@ func UserPhotosGeo(frm form.SearchPhotosGeo, sess *entity.Session) (results GeoR
 		s = s.Where("files.file_aspect_ratio = 1")
 	}
 
-	// Filter by main color.
-	if frm.Color != "" {
+	// Filter by file main color.
+	if txt.NotEmpty(frm.Color) {
 		s = s.Where("files.file_main_color IN (?)", SplitOr(strings.ToLower(frm.Color)))
+	}
+
+	// Filter by file codec.
+	if txt.NotEmpty(frm.Codec) {
+		s = s.Where("files.file_codec IN (?)", SplitOr(strings.ToLower(frm.Codec)))
 	}
 
 	// Filter by chroma.
@@ -530,7 +541,7 @@ func UserPhotosGeo(frm form.SearchPhotosGeo, sess *entity.Session) (results GeoR
 	} else if frm.Video {
 		s = s.Where("photos.photo_type = ?", media.Video)
 	} else if frm.Photo {
-		s = s.Where("photos.photo_type IN ('image','raw','live','animated')")
+		s = s.Where("photos.photo_type IN ('image','raw','live','animated','vector')")
 	}
 
 	// Filter by storage path.

@@ -32,6 +32,7 @@ type Data struct {
 	Duration         time.Duration `meta:"Duration,MediaDuration,TrackDuration,PreviewDuration"`
 	FPS              float64       `meta:"VideoFrameRate,VideoAvgFrameRate"`
 	Frames           int           `meta:"FrameCount,AnimationFrames"`
+	Pages            int           `meta:"PageCount,NPages,Pages"`
 	Codec            string        `meta:"CompressorID,VideoCodecID,CodecID,OtherFormat,FileType"`
 	Title            string        `meta:"Title,Headline" xmp:"dc:title" dc:"title,title.Alt"`
 	Caption          string        `meta:"Description,ImageDescription,Caption,Caption-Abstract" xmp:"Description,Description.Alt"`
@@ -50,7 +51,7 @@ type Data struct {
 	CameraSerial     string        `meta:"SerialNumber"`
 	LensMake         string        `meta:"LensMake"`
 	LensModel        string        `meta:"LensModel,Lens,LensID" xmp:"LensModel,Lens"`
-	Software         string        `meta:"Software,CreatorTool,HistorySoftwareAgent,ProcessingSoftware"`
+	Software         string        `meta:"Software,Producer,CreatorTool,Creator,CreatorSubTool,HistorySoftwareAgent,ProcessingSoftware"`
 	Flash            bool          `meta:"FlashFired"`
 	FocalLength      int           `meta:"FocalLength,FocalLengthIn35mmFormat"`
 	FocalDistance    float64       `meta:"HyperfocalDistance"`

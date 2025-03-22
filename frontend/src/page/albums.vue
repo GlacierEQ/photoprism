@@ -20,62 +20,45 @@
       >
         <v-text-field
           :model-value="filter.q"
+          :density="density"
           hide-details
           clearable
           overflow
           single-line
-          rounded
+          rounded="pill"
           variant="solo-filled"
-          :density="density"
+          color="surface-variant"
           validate-on="invalid-input"
-          :placeholder="$gettext('Search')"
           autocomplete="off"
           autocorrect="off"
           autocapitalize="none"
-          prepend-inner-icon="mdi-magnify"
-          color="surface-variant"
+          :prepend-inner-icon="canExpand ? 'mdi-tune' : 'mdi-magnify'"
+          :placeholder="$gettext('Search')"
           class="input-search background-inherit elevation-0"
+          :class="{ 'input-search--expanded': expanded, 'input-search--focus': !canExpand }"
           @update:model-value="
             (v) => {
               updateFilter({ q: v });
             }
           "
           @keyup.enter="() => updateQuery()"
+          @click:prepend-inner.stop="toggleExpansionPanel"
           @click:clear="
             () => {
               updateQuery({ q: '' });
             }
           "
         ></v-text-field>
-        <v-btn icon class="action-reload" :title="$gettext('Reload')" @click.stop="refresh()">
-          <v-icon>mdi-refresh</v-icon>
-        </v-btn>
-        <v-btn
-          v-if="canUpload"
-          icon
-          class="hidden-sm-and-down action-upload"
-          :title="$gettext('Upload')"
-          @click.stop="showUpload()"
-        >
-          <v-icon>mdi-cloud-upload</v-icon>
-        </v-btn>
+
         <v-btn
           v-if="canManage && staticFilter.type === 'album'"
-          icon
-          class="action-add"
           :title="$gettext('Add Album')"
+          icon="mdi-plus"
+          class="action-add ms-1"
           @click.prevent="create()"
-        >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-        <v-btn
-          v-if="canManage && !staticFilter['order']"
-          :icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-          :title="$gettext('Expand Search')"
-          class="action-expand"
-          :class="{ 'action-expand--active': expanded }"
-          @click.stop="toggleExpansionPanel"
         ></v-btn>
+
+        <p-action-menu v-if="$vuetify.display.mdAndUp" :items="menuActions" button-class="ms-1"></p-action-menu>
       </v-toolbar>
 
       <div class="toolbar-expansion-panel">
@@ -153,8 +136,8 @@
       </div>
     </v-form>
 
-    <div v-if="loading" class="pa-6">
-      <v-progress-linear :indeterminate="true"></v-progress-linear>
+    <div v-if="loading" class="p-page__loading">
+      <p-loading></p-loading>
     </div>
     <div v-else class="p-page__content">
       <p-scroll
@@ -176,7 +159,7 @@
       ></p-album-clipboard>
 
       <div v-if="results.length === 0" class="pa-3">
-        <v-alert color="primary" icon="mdi-lightbulb-outline" class="no-results" variant="outlined">
+        <v-alert color="surface-variant" icon="mdi-lightbulb-outline" class="no-results" variant="outlined">
           <div class="font-weight-bold">
             {{ $gettext(`No albums found`) }}
           </div>
@@ -380,8 +363,15 @@ import $notify from "common/notify";
 import { Input, InputInvalid, ClickShort, ClickLong } from "common/input";
 import * as options from "options/options";
 
+import PLoading from "component/loading.vue";
+import PActionMenu from "component/action/menu.vue";
+
 export default {
   name: "PPageAlbums",
+  components: {
+    PLoading,
+    PActionMenu,
+  },
   props: {
     staticFilter: {
       type: Object,
@@ -425,8 +415,10 @@ export default {
       canManage: this.$config.allow("albums", "manage"),
       canEdit: this.$config.allow("albums", "update"),
       config: this.$config.values,
+      isSuperAdmin: this.$session.isSuperAdmin(),
       featShare: features.share,
       featPrivate: features.private,
+      featSettings: features.settings,
       categories: categories,
       subscriptions: [],
       listen: false,
@@ -484,6 +476,9 @@ export default {
 
       return "";
     },
+    canExpand: function () {
+      return this.canManage && !this.staticFilter["order"];
+    },
   },
   watch: {
     $route() {
@@ -526,6 +521,28 @@ export default {
     this.$view.leave(this);
   },
   methods: {
+    menuActions() {
+      return [
+        {
+          name: "refresh",
+          icon: "mdi-refresh",
+          text: this.$gettext("Refresh"),
+          visible: true,
+          click: () => {
+            this.refresh();
+          },
+        },
+        {
+          name: "upload",
+          icon: "mdi-cloud-upload",
+          text: this.$gettext("Upload"),
+          visible: this.canUpload,
+          click: () => {
+            this.showUpload();
+          },
+        },
+      ];
+    },
     onCtrl(ev) {
       if (!ev || !(ev instanceof KeyboardEvent) || !ev.ctrlKey || !this.$view.isActive(this)) {
         return;
@@ -543,6 +560,10 @@ export default {
       }
     },
     toggleExpansionPanel() {
+      if (!this.canExpand) {
+        return;
+      }
+
       this.expanded = !this.expanded;
     },
     hideExpansionPanel() {

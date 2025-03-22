@@ -960,14 +960,19 @@ func (m *MediaFile) NotAnimated() bool {
 	return !m.IsAnimated()
 }
 
-// IsVideo returns true if this is a video file.
-func (m *MediaFile) IsVideo() bool {
-	return m.HasMediaType(media.Video)
+// IsDocument returns true if this is a document file.
+func (m *MediaFile) IsDocument() bool {
+	return m.HasMediaType(media.Document)
 }
 
 // IsVector returns true if this is a vector graphics.
 func (m *MediaFile) IsVector() bool {
 	return m.HasMediaType(media.Vector) || m.IsSVG()
+}
+
+// IsVideo returns true if this is a video file.
+func (m *MediaFile) IsVideo() bool {
+	return m.HasMediaType(media.Video)
 }
 
 // IsSidecar checks if the file is a metadata sidecar file, independent of the storage location.
@@ -1055,7 +1060,7 @@ func (m *MediaFile) ExifSupported() bool {
 
 // IsMedia returns true if this is a media file (photo or video, not sidecar or other).
 func (m *MediaFile) IsMedia() bool {
-	return !m.IsThumb() && (m.IsImage() || m.IsRaw() || m.IsVideo() || m.IsVector())
+	return !m.IsThumb() && (m.IsImage() || m.IsRaw() || m.IsVideo() || m.IsVector() || m.IsDocument())
 }
 
 // PreviewImage returns a PNG or JPEG version of the media file, if exists.

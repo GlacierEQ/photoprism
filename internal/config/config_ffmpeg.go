@@ -20,8 +20,10 @@ func (c *Config) FFmpegEnabled() bool {
 
 // FFmpegEncoder returns the FFmpeg AVC encoder name.
 func (c *Config) FFmpegEncoder() encode.Encoder {
-	if c.options.FFmpegEncoder == "" || c.options.FFmpegEncoder == encode.SoftwareAvc.String() {
+	if c.options.FFmpegEncoder == encode.SoftwareAvc.String() {
 		return encode.SoftwareAvc
+	} else if c.options.FFmpegEncoder == "" {
+		return encode.DefaultAvcEncoder()
 	}
 
 	return encode.FindEncoder(c.options.FFmpegEncoder)
