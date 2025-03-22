@@ -1,0 +1,47 @@
+{
+    "name": "photoprism2",
+    "version": "1.0.0",
+    "description": "PhotoPrism extended functionality with Docker/Podman",
+    "main": "index.js",
+    "bin": {
+        "photoprism-cli": "./scripts/cli.js"
+    },
+    "scripts": {
+        "verify-deps": "node ./scripts/verify-dependencies.js",
+        "init": "node ./scripts/initialize.js",
+        "deploy": "node ./scripts/deploy.js",
+        "cli": "node ./scripts/cli.js",
+        "start": "node ./index.js",
+        "benchmark": "node ./scripts/benchmark-runner.js",
+        "benchmark:system": "node ./scripts/benchmark-runner.js system",
+        "benchmark:image": "node ./scripts/benchmark-runner.js image",
+        "benchmark:database": "node ./scripts/benchmark-runner.js database",
+        "benchmark:docker": "node ./scripts/benchmark-runner.js docker",
+        "benchmark:network": "node ./scripts/benchmark-runner.js network",
+        "podman:troubleshoot": "node ./scripts/podman-troubleshoot.js",
+        "docker:troubleshoot": "node ./scripts/docker-troubleshoot.js",
+        "test": "jest",
+        "docker:build": "node scripts/utils/run-docker-command.js build",
+        "docker:up": "node scripts/utils/run-docker-command.js up",
+        "docker:down": "node scripts/utils/run-docker-command.js down",
+        "docker:logs": "node scripts/utils/run-docker-command.js logs",
+        "docker:restart": "node scripts/utils/run-docker-command.js restart",
+        "podman:up": "podman-compose -f podman/podman-compose.prod.yml --env-file podman/.env.prod up -d",
+        "podman:down": "podman-compose -f podman/podman-compose.prod.yml --env-file podman/.env.prod down",
+        "podman:logs": "podman-compose -f podman/podman-compose.prod.yml --env-file podman/.env.prod logs -f",
+        "podman:restart": "podman-compose -f podman/podman-compose.prod.yml --env-file podman/.env.prod restart"
+    },
+    "dependencies": {
+        "commander": "^9.0.0",
+        "express": "^4.17.1",
+        "dotenv": "^10.0.0",
+        "winston": "^3.3.3",
+        "fs-extra": "^10.0.0"
+    },
+    "devDependencies": {
+        "jest": "^27.0.6"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}

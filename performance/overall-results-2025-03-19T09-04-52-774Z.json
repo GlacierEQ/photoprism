@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-03-19T09:04:52.774Z",
+  "duration": 3856,
+  "results": {
+    "system": {
+      "cpuOperations": 17907893,
+      "cpuCores": 22,
+      "totalMemory": 34037186560,
+      "freeMemory": 7774732288,
+      "platform": "win32",
+      "release": "10.0.26100",
+      "uptime": 10325.781
+    },
+    "docker": {
+      "failed": true,
+      "error": "Command failed: docker run --rm hello-world\ndocker: error during connect: Head \"http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/_ping\": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\nSee 'docker run --help'.\n"
+    },
+    "imageProcessing": {
+      "skipped": true,
+      "reason": "Sample image not found"
+    },
+    "database": {
+      "failed": true,
+      "error": "Invalid record"
+    },
+    "network": {
+      "endpoints": [
+        "https://www.google.com",
+        "https://www.github.com",
+        "https://www.cloudflare.com"
+      ],
+      "requestTimes": {
+        "google": 341.11760000000004,
+        "github": 361.55139999999983,
+        "cloudflare": 672.2126000000003
+      }
+    }
+  },
+  "system": {
+    "platform": "win32",
+    "release": "10.0.26100",
+    "cpus": 22,
+    "totalMemory": 34037186560,
+    "freeMemory": 7731380224
+  },
+  "environment": "development"
+}

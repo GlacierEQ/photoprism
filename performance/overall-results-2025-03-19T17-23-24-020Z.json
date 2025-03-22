@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-03-19T17:23:24.021Z",
+  "duration": 7274,
+  "results": {
+    "system": {
+      "cpuOperations": 13760487,
+      "cpuCores": 22,
+      "totalMemory": 34037186560,
+      "freeMemory": 15536128,
+      "platform": "win32",
+      "release": "10.0.26100",
+      "uptime": 19236.703
+    },
+    "docker": {
+      "skipped": true,
+      "reason": "Docker not installed"
+    },
+    "imageProcessing": {
+      "skipped": true,
+      "reason": "Sample image not found"
+    },
+    "database": {
+      "failed": true,
+      "error": "Invalid record"
+    },
+    "network": {
+      "endpoints": [
+        "https://www.google.com",
+        "https://www.github.com",
+        "https://www.cloudflare.com"
+      ],
+      "requestTimes": {
+        "google": 1517.3152999999998,
+        "github": 794.9666000000007,
+        "cloudflare": 1047.9904999999999
+      }
+    }
+  },
+  "system": {
+    "platform": "win32",
+    "release": "10.0.26100",
+    "cpus": 22,
+    "totalMemory": 34037186560,
+    "freeMemory": 598016
+  },
+  "environment": "development"
+}

@@ -1,0 +1,41 @@
+{
+    "environment": "development",
+    "port": 3000,
+    "logLevel": "info",
+    "security": {
+        "apiKeys": [],
+        "cookieSecret": "GENERATE_RANDOM_SECRET_ON_INIT",
+        "sessionTimeout": 3600
+    },
+    "storage": {
+        "photoDir": "./storage/photos",
+        "tempDir": "./temp",
+        "maxUploadSize": 104857600
+    },
+    "database": {
+        "host": "localhost",
+        "port": 3306,
+        "user": "photoprism",
+        "password": "photoprism",
+        "database": "photoprism",
+        "ssl": false
+    },
+    "podman": {
+        "composeFile": "./podman/podman-compose.prod.yml",
+        "envFile": "./podman/.env.prod",
+        "networkName": "photoprism_network",
+        "containerPrefix": "photoprism_"
+    },
+    "features": {
+        "faceDetection": true,
+        "geoMapping": true,
+        "photoStacking": true,
+        "autoTagging": true
+    },
+    "performance": {
+        "concurrency": 2,
+        "batchSize": 100,
+        "memoryLimit": 0,
+        "highQuality": true
+    }
+}

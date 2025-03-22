@@ -1,0 +1,41 @@
+{
+  "startTime": 1742375091234,
+  "markers": {},
+  "memoryUsage": {
+    "rss": 60456960,
+    "heapTotal": 7634944,
+    "heapUsed": 5392952,
+    "external": 22769407,
+    "timestamp": 1742375091234
+  },
+  "counters": {},
+  "system": {
+    "platform": "win32",
+    "release": "10.0.26100",
+    "hostname": "NewAyge",
+    "cpus": 22,
+    "totalMemory": 34037186560,
+    "freeMemory": 7750062080,
+    "uptime": 10327.078,
+    "loadAvg": [
+      0,
+      0,
+      0
+    ]
+  },
+  "endTime": 1742375091237,
+  "duration": 3,
+  "endMemoryUsage": {
+    "rss": 60604416,
+    "heapTotal": 7634944,
+    "heapUsed": 5416008,
+    "external": 22769607,
+    "timestamp": 1742375091237
+  },
+  "memoryDelta": {
+    "rss": 147456,
+    "heapTotal": 0,
+    "heapUsed": 23056,
+    "external": 200
+  }
+}

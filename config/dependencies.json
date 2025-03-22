@@ -1,0 +1,15 @@
+{
+    "npmDependencies": [
+        "express",
+        "dotenv",
+        "winston",
+        "fs-extra"
+    ],
+    "systemDependencies": [
+        "node",
+        "npm",
+        "git",
+        "podman",
+        "podman-compose"
+    ]
+}

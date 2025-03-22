@@ -1,0 +1,50 @@
+{
+  "startTime": 1742375091241,
+  "markers": {
+    "db-write-time": {
+      "measurements": 1,
+      "average": 60.213700000000244,
+      "min": 60.213700000000244,
+      "max": 60.213700000000244,
+      "stdDev": 0,
+      "total": 60.213700000000244
+    }
+  },
+  "memoryUsage": {
+    "rss": 60616704,
+    "heapTotal": 7634944,
+    "heapUsed": 5474800,
+    "external": 22770407,
+    "timestamp": 1742375091241
+  },
+  "counters": {},
+  "system": {
+    "platform": "win32",
+    "release": "10.0.26100",
+    "hostname": "NewAyge",
+    "cpus": 22,
+    "totalMemory": 34037186560,
+    "freeMemory": 7751155712,
+    "uptime": 10327.093,
+    "loadAvg": [
+      0,
+      0,
+      0
+    ]
+  },
+  "endTime": 1742375091383,
+  "duration": 142,
+  "endMemoryUsage": {
+    "rss": 40013824,
+    "heapTotal": 7634944,
+    "heapUsed": 5274456,
+    "external": 1832679,
+    "timestamp": 1742375091383
+  },
+  "memoryDelta": {
+    "rss": -20602880,
+    "heapTotal": 0,
+    "heapUsed": -200344,
+    "external": -20937728
+  }
+}

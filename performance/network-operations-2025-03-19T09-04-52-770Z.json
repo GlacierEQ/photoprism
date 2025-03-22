@@ -1,0 +1,66 @@
+{
+  "startTime": 1742375091387,
+  "markers": {
+    "request-google-time": {
+      "measurements": 1,
+      "average": 341.11760000000004,
+      "min": 341.11760000000004,
+      "max": 341.11760000000004,
+      "stdDev": 0,
+      "total": 341.11760000000004
+    },
+    "request-github-time": {
+      "measurements": 1,
+      "average": 361.55139999999983,
+      "min": 361.55139999999983,
+      "max": 361.55139999999983,
+      "stdDev": 0,
+      "total": 361.55139999999983
+    },
+    "request-cloudflare-time": {
+      "measurements": 1,
+      "average": 672.2126000000003,
+      "min": 672.2126000000003,
+      "max": 672.2126000000003,
+      "stdDev": 0,
+      "total": 672.2126000000003
+    }
+  },
+  "memoryUsage": {
+    "rss": 40013824,
+    "heapTotal": 7634944,
+    "heapUsed": 5319152,
+    "external": 1812224,
+    "timestamp": 1742375091387
+  },
+  "counters": {},
+  "system": {
+    "platform": "win32",
+    "release": "10.0.26100",
+    "hostname": "NewAyge",
+    "cpus": 22,
+    "totalMemory": 34037186560,
+    "freeMemory": 7764086784,
+    "uptime": 10327.234,
+    "loadAvg": [
+      0,
+      0,
+      0
+    ]
+  },
+  "endTime": 1742375092769,
+  "duration": 1382,
+  "endMemoryUsage": {
+    "rss": 46878720,
+    "heapTotal": 11460608,
+    "heapUsed": 6986040,
+    "external": 2787402,
+    "timestamp": 1742375092769
+  },
+  "memoryDelta": {
+    "rss": 6864896,
+    "heapTotal": 3825664,
+    "heapUsed": 1666888,
+    "external": 975178
+  }
+}

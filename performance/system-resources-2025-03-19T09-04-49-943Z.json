@@ -1,0 +1,138 @@
+{
+  "startTime": 1742375088916,
+  "markers": {
+    "cpu-operations": {
+      "measurements": 1,
+      "average": 1000.1509000000001,
+      "min": 1000.1509000000001,
+      "max": 1000.1509000000001,
+      "stdDev": 0,
+      "total": 1000.1509000000001
+    },
+    "memory-operations": {
+      "measurements": 1,
+      "average": 0.26470000000017535,
+      "min": 0.26470000000017535,
+      "max": 0.26470000000017535,
+      "stdDev": 0,
+      "total": 0.26470000000017535
+    },
+    "disk-operations": {
+      "measurements": 1,
+      "average": 15.586300000000165,
+      "min": 15.586300000000165,
+      "max": 15.586300000000165,
+      "stdDev": 0,
+      "total": 15.586300000000165
+    }
+  },
+  "memoryUsage": {
+    "rss": 35549184,
+    "heapTotal": 6062080,
+    "heapUsed": 5148784,
+    "external": 1779193,
+    "timestamp": 1742375088917
+  },
+  "counters": {},
+  "system": {
+    "platform": "win32",
+    "release": "10.0.26100",
+    "hostname": "NewAyge",
+    "cpus": 22,
+    "totalMemory": 34037186560,
+    "freeMemory": 7827869696,
+    "uptime": 10324.765,
+    "loadAvg": [
+      0,
+      0,
+      0
+    ]
+  },
+  "memorySnapshots": {
+    "memory-snapshot-0": {
+      "rss": 38965248,
+      "heapTotal": 7634944,
+      "heapUsed": 5652552,
+      "external": 2827633,
+      "timestamp": 1742375089924
+    },
+    "memory-snapshot-1": {
+      "rss": 38973440,
+      "heapTotal": 7634944,
+      "heapUsed": 5653864,
+      "external": 3876209,
+      "timestamp": 1742375089924
+    },
+    "memory-snapshot-2": {
+      "rss": 38977536,
+      "heapTotal": 7634944,
+      "heapUsed": 5654832,
+      "external": 4924785,
+      "timestamp": 1742375089924
+    },
+    "memory-snapshot-3": {
+      "rss": 38981632,
+      "heapTotal": 7634944,
+      "heapUsed": 5655824,
+      "external": 5973361,
+      "timestamp": 1742375089924
+    },
+    "memory-snapshot-4": {
+      "rss": 38985728,
+      "heapTotal": 7634944,
+      "heapUsed": 5656840,
+      "external": 7021937,
+      "timestamp": 1742375089924
+    },
+    "memory-snapshot-5": {
+      "rss": 38989824,
+      "heapTotal": 7634944,
+      "heapUsed": 5657920,
+      "external": 8070513,
+      "timestamp": 1742375089924
+    },
+    "memory-snapshot-6": {
+      "rss": 38993920,
+      "heapTotal": 7634944,
+      "heapUsed": 5658984,
+      "external": 9119089,
+      "timestamp": 1742375089924
+    },
+    "memory-snapshot-7": {
+      "rss": 38998016,
+      "heapTotal": 7634944,
+      "heapUsed": 5660072,
+      "external": 10167665,
+      "timestamp": 1742375089924
+    },
+    "memory-snapshot-8": {
+      "rss": 39002112,
+      "heapTotal": 7634944,
+      "heapUsed": 5662248,
+      "external": 11216241,
+      "timestamp": 1742375089924
+    },
+    "memory-snapshot-9": {
+      "rss": 39006208,
+      "heapTotal": 7634944,
+      "heapUsed": 5663728,
+      "external": 12264817,
+      "timestamp": 1742375089924
+    }
+  },
+  "endTime": 1742375089940,
+  "duration": 1024,
+  "endMemoryUsage": {
+    "rss": 60022784,
+    "heapTotal": 7634944,
+    "heapUsed": 4951424,
+    "external": 22759377,
+    "timestamp": 1742375089940
+  },
+  "memoryDelta": {
+    "rss": 24473600,
+    "heapTotal": 1572864,
+    "heapUsed": -197360,
+    "external": 20980184
+  }
+}

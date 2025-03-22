@@ -1,0 +1,7 @@
+{
+  "environment": "development",
+  "port": 3000,
+  "logLevel": "info",
+  "initialized": true,
+  "initializedAt": "2025-03-19T09:04:03.449Z"
+}
