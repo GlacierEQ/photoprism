@@ -129,3 +129,13 @@ func CallWithDependencies(ctx *cli.Context, action func(conf *config.Config) err
 
 	return err
 }
+
+package commands
+
+// Import from original photoprism for now
+import (
+    "github.com/photoprism/photoprism/internal/commands"
+)
+
+var Start = commands.Start
+var Version = commands.Version

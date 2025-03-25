@@ -1,0 +1,127 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build: Frontend (Production)",
+            "type": "npm",
+            "script": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/frontend",
+                "env": {
+                    "NODE_ENV": "production",
+                    "BUILD_ENV": "production"
+                }
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build: Frontend (Development)",
+            "type": "npm",
+            "script": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/frontend",
+                "env": {
+                    "NODE_ENV": "development",
+                    "BUILD_ENV": "development"
+                }
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build: Backend",
+            "type": "shell",
+            "command": "./scripts/build-dev.ps1",
+            "windows": {
+                "command": ".\\scripts\\build-dev.ps1"
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$go"
+            ]
+        },
+        {
+            "label": "Build: Docker Image",
+            "type": "shell",
+            "command": "docker build -t photoprism2:latest .",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker: Start Services",
+            "type": "shell",
+            "command": "docker compose up -d",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Docker: Stop Services",
+            "type": "shell",
+            "command": "docker compose down",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: All",
+            "type": "shell",
+            "command": "make test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$go-test"
+            ]
+        },
+        {
+            "label": "Build: Complete",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Build: Frontend (Production)",
+                "Build: Backend",
+                "Build: Docker Image"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Watch: Frontend",
+            "type": "npm",
+            "script": "watch",
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^.*$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "webpack is watching",
+                    "endsPattern": "webpack [\\d.]+ compiled"
+                }
+            }
+        },
+        {
+            "label": "Verify: Docker Image",
+            "type": "shell",
+            "command": "./scripts/verify-docker.sh",
+            "windows": {
+                "command": "bash ./scripts/verify-docker.sh"
+            },
+            "dependsOn": [
+                "Build: Docker Image"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

@@ -1,0 +1,60 @@
+# Version control
+.git
+.gitignore
+.github
+
+# Dependencies
+**/node_modules
+**/vendor
+
+# Build artifacts
+**/dist
+**/build
+**/*.pyc
+**/__pycache__
+
+# Development files
+.vscode
+.idea
+*.log
+*.tmp
+
+# Test files
+**/test
+**/tests
+**/*.test.js
+**/*.spec.js
+
+# Documentation
+docs
+*.md
+LICENSE
+
+# Cache and storage
+**/cache
+**/storage
+**/originals
+
+# Development artifacts
+.devcontainer
+.vscode
+*.env
+.env*
+.editorconfig
+*.log
+tmp/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+.coverage
+htmlcov/
+
+# Docker ignore
+node_modules
+build
+.git
+.vscode

@@ -1,4 +1,4 @@
-module github.com/photoprism/photoprism
+module github.com/photoprism/photoprism2
 
 require (
 	github.com/disintegration/imaging v1.6.2
@@ -167,6 +167,13 @@ require (
 	github.com/tidwall/pretty v1.2.1 // indirect
 )
 
-go 1.23.5
+go 1.24
 
-toolchain go1.24.0
+replace (
+    github.com/photoprism/photoprism => ./
+    github.com/photoprism/photoprism2 => ./
+)
+
+require (
+    github.com/photoprism/photoprism v0.0.0-00010101000000-000000000000
+)

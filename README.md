@@ -72,3 +72,97 @@ The `automate-build.sh` script is a unified tool for building Podman images. It 
 - Build with a specific tag: `./scripts/automate-build.sh --tag v1.0.0`
 - Build for multiple platforms: `./scripts/automate-build.sh --platform linux/amd64,linux/arm64`
 - Clean build without cache: `./scripts/automate-build.sh --no-cache`
+
+## PhotoPrism Clone
+
+### Running with Docker
+
+1.  **Build the Docker image:**
+
+    ```bash
+    docker-compose build
+    ```
+
+2.  **Run the application:**
+
+    ```bash
+    docker-compose up -d
+    ```
+
+3.  **Access the application** at `http://localhost:3000`.
+
+### Running with Docker Compose
+
+1.  **Navigate to the project directory:**
+
+    ```bash
+    cd photoprism2
+    ```
+
+2.  **Build the Docker image:**
+
+    ```bash
+    docker-compose build
+    ```
+
+3.  **Start the application using Docker Compose:**
+
+    ```bash
+    docker-compose up -d
+    ```
+
+4.  **Access the application** at `http://localhost:2342` (or the port you have mapped in `docker-compose.yml`).
+
+5.  **Stop the application:**
+
+    ```bash
+    docker-compose down
+    ```
+
+## Running with Podman Compose (Alternative)
+
+1.  **Navigate to the project directory:**
+
+    ```bash
+    cd photoprism2
+    ```
+
+2.  **Set the `PODMAN_ENABLED` build argument to `true`:**
+
+    ```bash
+    docker-compose build --build-arg PODMAN_ENABLED=true
+    ```
+
+3.  **Start the application using Podman Compose:**
+
+    ```bash
+    docker-compose -f docker-compose.yml up -d
+    ```
+
+    *Note: Ensure `podman-compose` is installed and configured.*
+
+4.  **Access the application** at `http://localhost:2342` (or the port you have mapped in `docker-compose.yml`).
+
+5.  **Stop the application:**
+
+    ```bash
+    docker-compose down
+    ```
+
+*Note: If you encounter issues with Podman, ensure it is properly installed and configured. You may need to start the Podman machine if you are on Windows or macOS.*
+
+*Note: The application now uses `entrypoint.sh` to handle startup and logging.*
+
+### Development
+
+1.  **Install dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+2.  **Run the application:**
+
+    ```bash
+    npm start
+    ```

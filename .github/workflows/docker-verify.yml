@@ -1,0 +1,35 @@
+name: Verify Docker Image
+
+on:
+  push:
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/docker-verify.yml'
+      - 'scripts/verify-docker.sh'
+  pull_request:
+    paths:
+      - 'Dockerfile'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t photoprism2:latest .
+
+      - name: Verify image
+        run: |
+          chmod +x ./scripts/verify-docker.sh
+          ./scripts/verify-docker.sh
+
+      - name: Archive verification logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: verification-logs
+          path: |
+            *.log
+            scripts/*.log

@@ -1,0 +1,237 @@
+version: "3.8"
+
+services:
+  photoprism:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PHOTOPRISM_VERSION: ${PHOTOPRISM_VERSION:-develop}
+        GO_VERSION: ${GO_VERSION:-1.21}
+        NODE_VERSION: ${NODE_VERSION:-18}
+      target: runtime
+    image: photoprism2:latest
+    security_opt:
+      - seccomp=unconfined
+      - apparmor=unconfined
+    ports:
+      - "${PHOTOPRISM_PORT:-2342}:2342"
+    volumes:
+      - ./:/workspace:cached
+      - photos:/photoprism/originals
+      - cache:/photoprism/cache
+      - config:/photoprism/config
+      - ./storage/credentials:/photoprism/storage/credentials:ro
+      - ./storage/gdrive:/photoprism/storage/gdrive:cached
+      - ./storage/models:/photoprism/assets/brains/models:cached
+      - "./storage:/photoprism/storage"
+      - "./originals:/photoprism/originals"
+      - "./import:/photoprism/import"
+    environment:
+      PHOTOPRISM_DEVELOPMENT: "true"
+      PHOTOPRISM_SITE_URL: "${PHOTOPRISM_SITE_URL}"
+      PHOTOPRISM_ADMIN_USER: "${PHOTOPRISM_ADMIN_USER}"
+      PHOTOPRISM_UPLOAD_NSFW: "true"
+      PHOTOPRISM_DETECT_NSFW: "true"
+      PHOTOPRISM_TENSORFLOW_MODEL_PATH: "/photoprism/assets/brains/models"
+      PHOTOPRISM_STORAGE_PATH: "/photoprism/storage"
+      GOOGLE_APPLICATION_CREDENTIALS: "/photoprism/storage/credentials/google.json"
+      AWS_SHARED_CREDENTIALS_FILE: "/photoprism/storage/credentials/aws"
+      PHOTOPRISM_AI_RETRY_LIMIT: "3"
+      PHOTOPRISM_AI_FALLBACK: "true"
+      PHOTOPRISM_SYNC_INTERVAL: "300"
+      PHOTOPRISM_SYNC_RETRIES: "3"
+      PHOTOPRISM_GDRIVE_CHUNK_SIZE: "16777216"
+      PHOTOPRISM_HTTP_TIMEOUT: "3600"
+      PHOTOPRISM_SORTING_MODE: "smart"
+      PHOTOPRISM_SORTING_INTERVAL: "60"
+      PHOTOPRISM_WORKERS: "3"
+      PHOTOPRISM_SCHEDULER_INTERVAL: "1m"
+      PHOTOPRISM_SERVICE_TIMEOUT: "90s"
+      PHOTOPRISM_SHUTDOWN_TIMEOUT: "30s"
+      PHOTOPRISM_READONLY_MODE: "false"
+      PHOTOPRISM_INTELLIGENT_SORT: "true"
+      PHOTOPRISM_ADAPTIVE_LIMITS: "true"
+      PHOTOPRISM_PIPELINE_MODE: "optimized"
+      PHOTOPRISM_HARDWARE_ACCELERATION: "auto"
+      PHOTOPRISM_DB_INIT: "true"
+      PHOTOPRISM_INIT_RETRY: "3"
+      PHOTOPRISM_INIT_TIMEOUT: "300s"
+      PHOTOPRISM_INIT_FORCE: "true"
+      PHOTOPRISM_INIT_CLEANUP: "true"
+      PHOTOPRISM_STARTUP_SEQUENCE: "sync"
+      PHOTOPRISM_GRACEFUL_SHUTDOWN: "true"
+      PHOTOPRISM_RECOVERY_MODE: "auto"
+      PHOTOPRISM_METADATA_RETRY: "true"
+      PHOTOPRISM_INIT_SEQUENCE: "ordered"
+      PHOTOPRISM_STARTUP_CHECKS: "true"
+      PHOTOPRISM_STARTUP_TIMEOUT: "300s"
+      PHOTOPRISM_WARMUP_MODE: "progressive"
+      PHOTOPRISM_RESOURCE_CHECKS: "true"
+      PHOTOPRISM_DEPENDENCY_VALIDATION: "true"
+      PHOTOPRISM_AUTH_MODE: "${PHOTOPRISM_AUTH_MODE:-password}"
+      PHOTOPRISM_HTTP_COMPRESSION: "gzip"
+      PHOTOPRISM_ADMIN_PASSWORD: "please-change"
+      PHOTOPRISM_DATABASE_DRIVER: "mysql"
+      PHOTOPRISM_DATABASE_SERVER: "mariadb:3306"
+      PHOTOPRISM_DATABASE_NAME: "photoprism"
+      PHOTOPRISM_DATABASE_USER: "photoprism"
+      PHOTOPRISM_DATABASE_PASSWORD: "insecure"
+      PHOTOPRISM_SITE_URL: "http://localhost:2342/"
+    env_file: .env
+    deploy:
+      resources:
+        limits:
+          cpus: '${CPU_LIMIT:-2}'
+          memory: ${MEMORY_LIMIT:-2G}
+        reservations:
+          cpus: '${CPU_RESERVE:-0.5}'
+          memory: ${MEMORY_RESERVE:-512M}
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+    healthcheck:
+      test: ["CMD", "/scripts/startup-check.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      start_interval: 5s
+    networks:
+      default:
+        ipv4_address: 172.28.1.1
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      redis:
+        condition: service_healthy
+      mariadb:
+        condition: service_healthy
+      init-models:
+        condition: service_completed_successfully
+      brains-coordinator:
+        condition: service_started
+      startup-validator:
+        condition: service_completed_successfully
+
+  redis:
+    image: redis:alpine
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+      start_interval: 5s
+    sysctls:
+      net.core.somaxconn: '511'
+    networks:
+      default:
+        ipv4_address: 172.28.1.2
+
+  mariadb:
+    image: mariadb:10.11
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+      start_interval: 5s
+    networks:
+      default:
+        ipv4_address: 172.28.1.3
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: photoprism
+      MYSQL_USER: photoprism
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+      MYSQL_ROOT_PASSWORD: "insecure"
+      MYSQL_DATABASE: "photoprism"
+      MYSQL_USER: "photoprism"
+      MYSQL_PASSWORD: "insecure"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - "./database:/var/lib/mysql"
+    secrets:
+      - db_root_password
+      - db_password
+    command: mysqld --innodb-buffer-pool-size=128M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
+
+  init-models:
+    image: photoprism2:latest
+    volumes:
+      - ./storage/models:/photoprism/assets/brains/models:cached
+    command: /scripts/init-ai-models.sh
+    restart: "no"
+
+  brains-coordinator:
+    image: photoprism2:latest
+    command: ["python", "-m", "brains.coordinator"]
+    volumes:
+      - ./BRAINS:/app/brains:cached
+    environment:
+      PYTHONPATH: /app
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  startup-validator:
+    image: photoprism2:latest
+    command: ["/scripts/startup-check.sh"]
+    volumes:
+      - ./scripts:/scripts:ro
+    depends_on:
+      - redis
+      - mariadb
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1
+
+secrets:
+  db_root_password:
+    file: ./secrets/db_root_password.txt
+  db_password:
+    file: ./secrets/db_password.txt
+
+volumes:
+  photos:
+  cache:
+  config:
+  redis-data:
+  storage:
+  originals:
+  import:
+  database:
+  redis:
+  mariadb-data:
+  db_data:
