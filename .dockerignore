@@ -1,51 +1,60 @@
-# Local build files and directories
-/photos/*
-/frontend/node_modules/*
-/node_modules
-/assets/docs
-/assets/static/build/*
-/assets/facenet
-/assets/nasnet
-/assets/nsfw
-/storage
-/build
-/photoprism
-/photoprism-*
-/coverage.*
-/frontend/tests/acceptance/screenshots
-/test/
+# Version control
+.git
+.gitignore
+.github
 
-# Custom config, database, log, and temporary files
-/tmp/
-.env
-.dockerignore
-*.log
-*.jsonl
-*.db
-*.db-journal
-Dockerfile
-docker-compose*
-compose.yaml
-compose.*.yaml
-*.override.yml
-*.override.yaml
-*.tmp.yml
-*.tmp.yaml
+# Dependencies
+**/node_modules
+**/vendor
 
-# Automatically generated files, e.g. by editors and operating systems
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-.heartbeat
+# Build artifacts
+**/dist
+**/build
+**/*.pyc
+**/__pycache__
+
+# Development files
+.vscode
 .idea
-.glide
-*~
-.goutputstream*
-.c9revisions
-.settings
-.swp
-.tmp
+*.log
+*.tmp
+
+# Test files
+**/test
+**/tests
+**/*.test.js
+**/*.spec.js
+
+# Documentation
+docs
+*.md
+LICENSE
+
+# Cache and storage
+**/cache
+**/storage
+**/originals
+
+# Development artifacts
+.devcontainer
+.vscode
+*.env
+.env*
+.editorconfig
+*.log
+tmp/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+.coverage
+htmlcov/
+
+# Docker ignore
+node_modules
+build
+.git
+.vscode
