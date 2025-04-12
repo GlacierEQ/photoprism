@@ -33,7 +33,7 @@
     "@mdi/font": "^7.4.47",
     "@vue/compiler-sfc": "^3.5.13",
     "@vvo/tzdb": "^6.161.0",
-    "axios": "^1.8.1",
+    "axios": "^1.8.4",
     "axios-mock-adapter": "^2.1.0",
     "babel-loader": "^9.2.1",
     "babel-plugin-istanbul": "^7.0.0",
