@@ -129,6 +129,6 @@
   ],
   "devDependencies": {
     "@vue/language-server": "^2.2.0",
-    "babel-plugin-polyfill-corejs3": "^0.11.1"
+    "babel-plugin-polyfill-corejs3": "^0.12.0"
   }
 }
