@@ -1,5 +1,5 @@
 #### Base Image: Ubuntu 24.04 LTS (Noble Numbat)
-FROM ubuntu:noble
+FROM ubuntu:24.10
 
 # Copyright © 2018 - 2025 PhotoPrism UG. All rights reserved.
 #
