@@ -20,7 +20,7 @@ RUN make all install DESTDIR=/opt/photoprism
 
 ################################################## PRODUCTION STAGE ####################################################
 #### Base Image: Ubuntu 24.04 LTS (Noble Numbat)
-FROM ubuntu:noble
+FROM ubuntu:24.10
 
 # Add Open Container Initiative (OCI) annotations.
 # See: https://github.com/opencontainers/image-spec/blob/main/annotations.md
