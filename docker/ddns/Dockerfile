@@ -1,4 +1,4 @@
-FROM golang:1.26rc1-alpine
+FROM golang:1.26rc3-alpine
 
 # Q: What is this?
 # A: DDNS is a personal DynDNS client for DigitalOcean, see https://github.com/skibish/ddns.
