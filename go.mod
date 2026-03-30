@@ -41,8 +41,8 @@ require (
 	github.com/tidwall/gjson v1.18.0
 	github.com/ulule/deepcopier v0.0.0-20200430083143-45decc6639b6
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/crypto v0.36.0
-	golang.org/x/net v0.37.0
+	golang.org/x/crypto v0.48.0
+	golang.org/x/net v0.50.0
 	gonum.org/v1/gonum v0.15.1
 	gopkg.in/photoprism/go-tz.v2 v2.1.3
 	gopkg.in/yaml.v2 v2.4.0
@@ -50,7 +50,7 @@ require (
 
 require (
 	github.com/go-xmlfmt/xmlfmt v1.1.3 // indirect
-	golang.org/x/image v0.25.0
+	golang.org/x/image v0.38.0
 )
 
 require github.com/olekukonko/tablewriter v0.0.5
@@ -62,11 +62,9 @@ require github.com/chzyer/readline v1.5.1 // indirect
 require github.com/gabriel-vasile/mimetype v1.4.8
 
 require (
-	golang.org/x/sync v0.12.0
+	golang.org/x/sync v0.20.0
 	golang.org/x/time v0.11.0
 )
-
-require github.com/go-ldap/ldap/v3 v3.4.10
 
 require (
 	github.com/prometheus/client_golang v1.21.1
@@ -75,7 +73,7 @@ require (
 
 require github.com/dustinkirkland/golang-petname v0.0.0-20240428194347-eebcea082ee0
 
-require golang.org/x/text v0.23.0
+require golang.org/x/text v0.35.0
 
 require (
 	github.com/IGLOU-EU/go-wildcard v1.0.3
@@ -87,11 +85,10 @@ require (
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/urfave/cli/v2 v2.27.6
 	github.com/zitadel/oidc/v3 v3.36.1
-	golang.org/x/sys v0.31.0
+	golang.org/x/sys v0.41.0
 )
 
 require (
-	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
@@ -103,7 +100,6 @@ require (
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
 	github.com/dsoprea/go-utility/v2 v2.0.0-20221003172846-a3e1774ef349 // indirect
 	github.com/gin-contrib/sse v1.0.0 // indirect
-	github.com/go-asn1-ber/asn1-ber v1.5.7 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -146,7 +142,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.29.0 // indirect
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
 	golang.org/x/oauth2 v0.26.0 // indirect
-	golang.org/x/tools v0.30.0 // indirect
+	golang.org/x/tools v0.42.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
@@ -167,6 +163,4 @@ require (
 	github.com/tidwall/pretty v1.2.1 // indirect
 )
 
-go 1.23.5
-
-toolchain go1.24.0
+go 1.25.0
